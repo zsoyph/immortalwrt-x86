@@ -50,7 +50,12 @@ def main():
     shutil.copyfile(PROJECT / 'translations/adguardhome.zh_Hans.po', po)
     shutil.copyfile(PROJECT / 'configs/feeds.conf', core / 'feeds.conf')
     links = {
-        'daede': paths['daede'], 'istore': paths['istore'], 'nikki': paths['nikki'],
+        'daede': paths['daede'], 'istore': paths['istore'],
+        # The accepted configuration uses the stable core. Loading the unused
+        # alpha recipe as well creates a mutual-CONFLICTS Kconfig cycle.
+        'luci-app-nikki': paths['nikki'] / 'luci-app-nikki',
+        'nikki': paths['nikki'] / 'nikki',
+        'mihomo-meta': paths['nikki'] / 'mihomo-meta',
         'luci-app-bandix': paths['bandix-luci'] / 'luci-app-bandix',
         'openwrt-bandix': paths['bandix-backend'] / 'openwrt-bandix',
         'wrtbwmon-luci': paths['wrtbwmon-luci'], 'wrtbwmon': paths['wrtbwmon'] / 'wrtbwmon',
@@ -72,6 +77,7 @@ def main():
     for file in (core / 'files/etc/uci-defaults').iterdir():
         file.chmod(0o755)
     seed = (PROJECT / 'configs/x86-64.config').read_text(encoding='utf-8')
+    assert 'mihomo-meta' in selected(seed) and 'mihomo-alpha' not in selected(seed), 'r4 requires the selected stable Mihomo core'
     (core / '.config').write_text(seed)
     run(['make', 'defconfig'], core)
     resolved = (core / '.config').read_text(encoding='utf-8')
