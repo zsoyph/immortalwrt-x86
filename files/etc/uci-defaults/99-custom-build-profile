@@ -3,9 +3,14 @@
 uci -q set system.@system[0].timezone='CST-8'
 uci -q set system.@system[0].zonename='Asia/Shanghai'
 uci -q commit system
-for service in bandix vlmcsd nikki wrtbwmon sqm mwan3 miniupnpd ddns ddns-go smartdns AdGuardHome adguardhome homeproxy openclash passwall dae daed openvpn tailscale zerotier frpc frps dockerd samba4 aria2 openlist minidlna netdata autoreboot banip; do
+for service in bandix vlmcsd nikki wrtbwmon sqm mwan3 miniupnpd ddns ddns-go smartdns AdGuardHome adguardhome homeproxy openclash passwall dae daed openvpn tailscale zerotier frpc frps dockerd samba4 aria2 openlist minidlna autoreboot banip; do
     if [ -x "/etc/init.d/$service" ]; then
         "/etc/init.d/$service" disable
     fi
 done
+# Netdata stays on so the LuCI dashboard works right after the first boot.
+if [ -x /etc/init.d/netdata ]; then
+    /etc/init.d/netdata enable
+    /etc/init.d/netdata start
+fi
 exit 0

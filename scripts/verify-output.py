@@ -43,13 +43,14 @@ def main():
     subprocess.run(['sha256sum', '-c', 'sha256sums'], cwd=target, check=True)
     names = {line.split(' - ')[0] for line in next(target.glob('*.manifest')).read_text(encoding='utf-8').splitlines()}
     required_apps = {line.split(' - ')[0] for line in (PROJECT / 'docs/baseline-r4/firmware.manifest').read_text(encoding='utf-8').splitlines() if line.startswith('luci-app-')}
+    required_apps |= {'luci-app-partexp', 'luci-app-poweroffdevice'}
     assert required_apps <= names, sorted(required_apps - names)
     assert {'bandix', 'dae', 'daed', 'firewall4', 'nftables-json', 'iptables-nft', 'ip6tables-nft', 'kmod-fs-cifs', 'vlmcsd', 'luci-i18n-adguardhome-zh-cn'} <= names
     removed = {'luci-app-acme', 'luci-app-https-dns-proxy', 'luci-app-irqbalance', 'luci-app-banip', 'luci-app-passwall2', 'luci-app-transmission', 'luci-app-nlbwmon', 'luci-app-adblock-fast'}
     assert not names & removed
     assert not any('bandix-plus' in name or ('tables' in name and 'legacy' in name) for name in names)
-    assert len(required_apps) == 36
-    assert len(names) == 649, f'Unexpected manifest package count: {len(names)}'
+    assert len(required_apps) == 38
+    assert len(names) == 659, f'Unexpected manifest package count: {len(names)}'
     images = []
     for filesystem in ['ext4', 'squashfs']:
         for boot in ['combined', 'combined-efi']:

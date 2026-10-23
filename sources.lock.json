@@ -56,6 +56,14 @@
       "url": "https://github.com/brvphoenix/wrtbwmon.git",
       "commit": "f82f9b393842d2113c3253a4902af50bfc757e1a",
       "archive_sha256": "bea34a8d29e63ce9576c7ce83548f2c92646acf40f7e01b3da540101dd757f14"
+    },
+    "poweroffdevice": {
+      "url": "https://github.com/sirpdboy/luci-app-poweroffdevice.git",
+      "commit": "8f53359c3234c7c398b846b5425f9b0b017c03ec"
+    },
+    "partexp": {
+      "url": "https://github.com/sirpdboy/luci-app-partexp.git",
+      "commit": "236187cfe4f1fab7f2dde5279ce378324c3e5f40"
     }
   }
 }

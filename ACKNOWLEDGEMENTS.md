@@ -13,6 +13,8 @@
 | [OpenWrt-nikki](https://github.com/nikkinikki-org/OpenWrt-nikki) | Nikki/Mihomo 集成 |
 | [luci-app-bandix](https://github.com/timsaya/luci-app-bandix)、[openwrt-bandix](https://github.com/timsaya/openwrt-bandix) | 标准 Bandix 前端和后端打包 |
 | [luci-app-wrtbwmon](https://github.com/brvphoenix/luci-app-wrtbwmon)、[wrtbwmon](https://github.com/brvphoenix/wrtbwmon) | 实时带宽统计 |
+| [luci-app-poweroffdevice](https://github.com/sirpdboy/luci-app-poweroffdevice) | 系统菜单下的关机/重启 Web 入口 |
+| [luci-app-partexp](https://github.com/sirpdboy/luci-app-partexp) | 一键分区格式化、扩容与自动挂载 |
 | [AdGuard Home](https://github.com/AdguardTeam/AdGuardHome) | DNS 过滤服务；本项目补充其 LuCI 插件中文翻译 |
 | [Open-Box](https://github.com/liandu2024/Open-Box) | 用户选择的官方后安装项目，本固件未打包 |
 | [GitHub Actions](https://github.com/features/actions) | 云编译执行环境 |
