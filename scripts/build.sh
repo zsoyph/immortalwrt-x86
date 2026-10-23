@@ -9,6 +9,14 @@ export GOPROXY='https://goproxy.cn|https://proxy.golang.org|direct'
 export GOSUMDB=sum.golang.org
 jobs=${BUILD_JOBS:-$(nproc)}
 make download -j"$jobs" V=s 2>&1 | tee "$project/logs/download.log"
+# A fresh runner has no staging_dir/host tools or target toolchain yet.
+# Build them before invoking an individual package target such as bpf-headers.
+for stage in tools/install toolchain/install; do
+    label=${stage//\//-}
+    if ! make -j"$jobs" "$stage" V=s 2>&1 | tee "$project/logs/$label.log"; then
+        make -j1 "$stage" V=s 2>&1 | tee "$project/logs/$label-retry.log"
+    fi
+done
 make -j1 package/kernel/bpf-headers/compile V=s 2>&1 | tee "$project/logs/bpf-headers.log"
 if ! make -j"$jobs" V=s 2>&1 | tee "$project/logs/build.log"; then
     make -j1 V=s 2>&1 | tee "$project/logs/build-retry.log"
