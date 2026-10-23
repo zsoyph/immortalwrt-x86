@@ -1,0 +1,103 @@
+name: Build ImmortalWrt x86 r4
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/build-immortalwrt.yml'
+      - 'configs/**'
+      - 'files/**'
+      - 'patches/**'
+      - 'translations/**'
+      - 'scripts/**'
+      - 'sources.lock.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: immortalwrt-x86-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Locked r4 / x86-64 / BIOS + UEFI
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      TZ: Asia/Shanghai
+      BUILD_JOBS: '4'
+    steps:
+      - name: Checkout build project
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Check project inputs
+        run: |
+          python3 scripts/check-project.py
+          bash -n scripts/build.sh scripts/install-dependencies.sh
+
+      - name: Prepare hosted runner disk
+        run: |
+          # Only preinstalled SDKs in this disposable GitHub-hosted VM are removed.
+          test "$GITHUB_ACTIONS" = true
+          sudo rm -rf -- /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache /usr/share/swift
+          df -h .
+          available=$(df --output=avail -BG . | tail -1 | tr -dc '0-9')
+          test "$available" -ge 55 || { echo 'Need at least 55 GiB free for this full plugin build'; exit 1; }
+
+      - name: Install dependencies and check host eBPF compiler
+        run: bash scripts/install-dependencies.sh
+
+      - name: Recreate locked sources, patches, menus and configuration
+        run: |
+          mkdir -p logs
+          set -o pipefail
+          python3 scripts/prepare.py 2>&1 | tee logs/prepare.log
+
+      - name: Restore source download cache
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: work/immortalwrt/dl
+          key: x86-r4-downloads-${{ hashFiles('sources.lock.json', 'configs/x86-64.config') }}-${{ github.run_id }}
+          restore-keys: |
+            x86-r4-downloads-${{ hashFiles('sources.lock.json', 'configs/x86-64.config') }}-
+
+      - name: Download, compile and verify firmware
+        run: bash scripts/build.sh
+
+      - name: Upload verified firmware, manifest and checksums
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: immortalwrt-25.12.2-x86-64-r4-${{ github.run_number }}
+          path: output/
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload this run's diagnostics
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: build-logs-r4-${{ github.run_number }}
+          path: |
+            logs/
+            work/preparation.json
+            work/immortalwrt/.config
+            work/immortalwrt/logs/
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Write build summary
+        if: always()
+        run: |
+          {
+            echo '## ImmortalWrt x86 r4'
+            echo 'Baseline: 25.12.2 / Linux 6.12.103 / standard Bandix / AdGuard Home LuCI 简体中文'
+            echo 'Firmware is available only when compile and artifact verification succeeded.'
+            echo 'Cloud checks verify images, manifest, selected apps, eBPF flags and LMO packaging.'
+            echo 'Historical local BIOS/UEFI/Chinese HTTP tests are documented separately; this run does not claim them.'
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+project=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+work=${1:-"$project/work"}
+mkdir -p "$project/logs"
+cd "$work/immortalwrt"
+export LANG=C.UTF-8
+export GOPROXY='https://goproxy.cn|https://proxy.golang.org|direct'
+export GOSUMDB=sum.golang.org
+jobs=${BUILD_JOBS:-$(nproc)}
+make download -j"$jobs" V=s 2>&1 | tee "$project/logs/download.log"
+make -j1 package/kernel/bpf-headers/compile V=s 2>&1 | tee "$project/logs/bpf-headers.log"
+if ! make -j"$jobs" V=s 2>&1 | tee "$project/logs/build.log"; then
+    make -j1 V=s 2>&1 | tee "$project/logs/build-retry.log"
+fi
+python3 "$project/scripts/verify-output.py" --work "$work" --output "$project/output"

@@ -1,0 +1,12 @@
+diff --git a/dae/Makefile b/dae/Makefile
+index 69a86be..25502f8 100644
+--- a/dae/Makefile
++++ b/dae/Makefile
+@@ -106,6 +106,7 @@ endef
+ 
+ define Build/Compile
+ 	( \
++		set -e ; \
+ 		pushd $(PKG_BUILD_DIR) ; \
+ 		export \
+ 		$(GO_GENERAL_BUILD_CONFIG_VARS) \

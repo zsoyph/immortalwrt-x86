@@ -1,0 +1,61 @@
+{
+  "baseline": "20261023-r4",
+  "version": "25.12.2",
+  "kernel": "6.12.103",
+  "repositories": {
+    "core": {
+      "url": "https://github.com/immortalwrt/immortalwrt.git",
+      "commit": "4fc16f2985a358bd43bb522e43f05395fcbd6ed5"
+    },
+    "packages": {
+      "url": "https://github.com/immortalwrt/packages.git",
+      "commit": "84bd86384928955b568988ca0e09e2c78c75173d"
+    },
+    "luci": {
+      "url": "https://github.com/immortalwrt/luci.git",
+      "commit": "d6167ea0645cbd1327708d85f94824f42d0eb872"
+    },
+    "routing": {
+      "url": "https://github.com/openwrt/routing.git",
+      "commit": "e49d76035aafb85ddc993b59271d8c7ba56b5362"
+    },
+    "daede": {
+      "url": "https://github.com/kenzok8/openwrt-daede.git",
+      "commit": "b2ee711a345d171d78af3d510378b689bdfb9830"
+    },
+    "istore": {
+      "url": "https://github.com/istoreos/istore.git",
+      "commit": "a97ace34f2da358a015b094d326bba2697697f2e"
+    },
+    "nas-luci": {
+      "url": "https://github.com/linkease/nas-packages-luci.git",
+      "commit": "93e94175535c0b793300eacb3fe231601d0e87d8"
+    },
+    "nas-packages": {
+      "url": "https://github.com/linkease/nas-packages.git",
+      "commit": "2fc436d5507bd90f00093fd4a94b93968acce32b"
+    },
+    "wrtbwmon-luci": {
+      "url": "https://github.com/brvphoenix/luci-app-wrtbwmon.git",
+      "commit": "f1b59b2309a0bc45511a1e7432c6c72f080a47d7"
+    },
+    "bandix-luci": {
+      "url": "https://github.com/timsaya/luci-app-bandix.git",
+      "commit": "159a6de184b8cbd0694b40f018e737d0a3c82e7e"
+    },
+    "bandix-backend": {
+      "url": "https://github.com/timsaya/openwrt-bandix.git",
+      "commit": "c95b03d40b30c31e89c090aaf134750f05bf3f19"
+    },
+    "nikki": {
+      "url": "https://github.com/nikkinikki-org/OpenWrt-nikki.git",
+      "commit": "78e1a751d55ed0762811f054ee699049473da7b8",
+      "archive_sha256": "184c30bb6497666c6d14ffd9bf5bad436513a0b86cf82b922b8fccabaf6ec1e0"
+    },
+    "wrtbwmon": {
+      "url": "https://github.com/brvphoenix/wrtbwmon.git",
+      "commit": "f82f9b393842d2113c3253a4902af50bfc757e1a",
+      "archive_sha256": "bea34a8d29e63ce9576c7ce83548f2c92646acf40f7e01b3da540101dd757f14"
+    }
+  }
+}

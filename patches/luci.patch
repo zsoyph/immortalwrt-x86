@@ -1,0 +1,1683 @@
+diff --git a/applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js b/applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js
+index 7c74d42f..57c73d25 100644
+--- a/applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js
++++ b/applications/luci-app-adguardhome/htdocs/luci-static/resources/view/adguardhome/config.js
+@@ -61,7 +61,7 @@ async function getVersion() {
+ 		return version;
+ 	} catch (e) {
+ 		console.error(e);
+-		return 'unknown version';
++		return _('Unknown version');
+ 	}
+ }
+ 
+diff --git a/applications/luci-app-cifs-mount/root/usr/share/luci/menu.d/luci-app-cifs-mount.json b/applications/luci-app-cifs-mount/root/usr/share/luci/menu.d/luci-app-cifs-mount.json
+index 95c9b91d..09df7873 100644
+--- a/applications/luci-app-cifs-mount/root/usr/share/luci/menu.d/luci-app-cifs-mount.json
++++ b/applications/luci-app-cifs-mount/root/usr/share/luci/menu.d/luci-app-cifs-mount.json
+@@ -1,13 +1,18 @@
+ {
+-	"admin/nas/cifs-mount": {
+-		"title": "Mount SMB NetShare",
+-		"action": {
+-			"type": "view",
+-			"path": "cifs-mount"
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-cifs-mount" ],
+-			"uci": { "cifs-mount": true }
+-		}
+-	}
++  "admin/nas/cifs-mount": {
++    "title": "SMB/CIFS 远程挂载",
++    "action": {
++      "type": "view",
++      "path": "cifs-mount"
++    },
++    "depends": {
++      "acl": [
++        "luci-app-cifs-mount"
++      ],
++      "uci": {
++        "cifs-mount": true
++      }
++    },
++    "order": 40
++  }
+ }
+diff --git a/applications/luci-app-dockerman/htdocs/luci-static/resources/dockerman/common.js b/applications/luci-app-dockerman/htdocs/luci-static/resources/dockerman/common.js
+index 4425ecd9..818f4363 100644
+--- a/applications/luci-app-dockerman/htdocs/luci-static/resources/dockerman/common.js
++++ b/applications/luci-app-dockerman/htdocs/luci-static/resources/dockerman/common.js
+@@ -437,7 +437,7 @@ const dv = view.extend({
+ 	outputText: '', // Initialize output text
+ 
+ 	get dockerman_url() {
+-		return L.url('admin/services/dockerman');
++		return L.url('admin/docker');
+ 	},
+ 
+ 	parseHeaders(headers, array) {
+diff --git a/applications/luci-app-dockerman/root/usr/share/luci/menu.d/luci-app-dockerman.json b/applications/luci-app-dockerman/root/usr/share/luci/menu.d/luci-app-dockerman.json
+index 9fa0e7e1..8e751a27 100644
+--- a/applications/luci-app-dockerman/root/usr/share/luci/menu.d/luci-app-dockerman.json
++++ b/applications/luci-app-dockerman/root/usr/share/luci/menu.d/luci-app-dockerman.json
+@@ -1,402 +1,905 @@
+ {
+-	"admin/services/dockerman": {
+-		"title": "Dockerman JS",
+-		"order": "60",
+-		"action": {
+-			"type": "firstchild"
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ],
+-			"fs": {
+-				"/etc/init.d/dockerd": "executable",
+-				"/usr/bin/dockerd": "executable"
+-			},
+-			"uci": { "dockerd": true }
+-		}
+-	},
+-
+-	"admin/services/dockerman/overview": {
+-		"title": "Overview",
+-		"order": 1,
+-		"action": {
+-			"type": "view",
+-			"path": "dockerman/overview"
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/configuration": {
+-		"title": "Configuration",
+-		"order": 2,
+-		"action": {
+-			"type": "view",
+-			"path": "dockerman/configuration"
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/container/archive/*": {
+-		"action": {
+-			"type": "alias",
+-			"path": "admin/services/dockerman/containers"
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/container/archive/put/*": {
+-		"action": {
+-			"type": "function",
+-			"module": "luci.controller.docker",
+-			"function": "container_put_archive"
+-		},
+-		"auth": {
+-			"methods": [ "cookie:sysauth_https", "cookie:sysauth_http" ],
+-			"login": true
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/container/archive/get/*": {
+-		"action": {
+-			"type": "function",
+-			"module": "luci.controller.docker",
+-			"function": "container_get_archive"
+-		},
+-		"auth": {
+-			"methods": [ "cookie:sysauth_https", "cookie:sysauth_http" ],
+-			"login": true
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/container/export/*": {
+-		"action": {
+-			"type": "function",
+-			"module": "luci.controller.docker",
+-			"function": "container_export"
+-		},
+-		"auth": {
+-			"methods": [ "cookie:sysauth_https", "cookie:sysauth_http" ],
+-			"login": true
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/container/*": {
+-		"title_hide": "Container",
+-		"action": {
+-			"type": "view",
+-			"path": "dockerman/container"
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/containers": {
+-		"title": "Containers",
+-		"order": 3,
+-		"action": {
+-			"type": "view",
+-			"path": "dockerman/containers"
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/containers/prune": {
+-		"action": {
+-			"type": "function",
+-			"module": "luci.controller.docker",
+-			"function": "containers_prune",
+-			"post": true
+-		},
+-		"auth": {
+-			"methods": [ "cookie:sysauth_https", "cookie:sysauth_http" ],
+-			"login": true
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/container": {
+-		"action": {
+-			"type": "alias",
+-			"path": "admin/services/dockerman/containers"
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/container_new": {
+-		"title_hide": "Container",
+-		"action": {
+-			"type": "view",
+-			"path": "dockerman/container_new"
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/images/build": {
+-		"action": {
+-			"type": "function",
+-			"module": "luci.controller.docker",
+-			"function": "image_build",
+-			"post": true
+-		},
+-		"auth": {
+-			"methods": [ "cookie:sysauth_https", "cookie:sysauth_http" ],
+-			"login": true
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/images/build/prune": {
+-		"action": {
+-			"type": "function",
+-			"module": "luci.controller.docker",
+-			"function": "image_build_prune",
+-			"post": true
+-		},
+-		"auth": {
+-			"methods": [ "cookie:sysauth_https", "cookie:sysauth_http" ],
+-			"login": true
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/images/get/*": {
+-		"action": {
+-			"type": "function",
+-			"module": "luci.controller.docker",
+-			"function": "image_get"
+-		},
+-		"auth": {
+-			"methods": [ "cookie:sysauth_https", "cookie:sysauth_http" ],
+-			"login": true
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/images/load": {
+-		"action": {
+-			"type": "function",
+-			"module": "luci.controller.docker",
+-			"function": "image_load",
+-			"post": true
+-		},
+-		"auth": {
+-			"methods": [ "cookie:sysauth_https", "cookie:sysauth_http" ],
+-			"login": true
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/images/prune": {
+-		"action": {
+-			"type": "function",
+-			"module": "luci.controller.docker",
+-			"function": "images_prune",
+-			"post": true
+-		},
+-		"auth": {
+-			"methods": [ "cookie:sysauth_https", "cookie:sysauth_http" ],
+-			"login": true
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/images": {
+-		"title": "Images",
+-		"order": 4,
+-		"action": {
+-			"type": "view",
+-			"path": "dockerman/images"
+-		}
+-	},
+-
+-	"admin/services/dockerman/images/create": {
+-		"action": {
+-			"type": "function",
+-			"module": "luci.controller.docker",
+-			"function": "image_create",
+-			"post": true
+-		},
+-		"auth": {
+-			"methods": [ "cookie:sysauth_https", "cookie:sysauth_http" ],
+-			"login": true
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/images/push/*": {
+-		"action": {
+-			"type": "function",
+-			"module": "luci.controller.docker",
+-			"function": "image_push",
+-			"post": true
+-		},
+-		"auth": {
+-			"methods": [ "cookie:sysauth_https", "cookie:sysauth_http" ],
+-			"login": true
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/image": {
+-		"action": {
+-			"type": "alias",
+-			"path": "admin/services/dockerman/images"
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/network/*": {
+-		"title_hide": "Network",
+-		"action": {
+-			"type": "view",
+-			"path": "dockerman/network"
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/networks": {
+-		"title": "Networks",
+-		"order": 5,
+-		"action": {
+-			"type": "view",
+-			"path": "dockerman/networks"
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/networks/prune": {
+-		"action": {
+-			"type": "function",
+-			"module": "luci.controller.docker",
+-			"function": "networks_prune",
+-			"post": true
+-		},
+-		"auth": {
+-			"methods": [ "cookie:sysauth_https", "cookie:sysauth_http" ],
+-			"login": true
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/network_new": {
+-		"title_hide": "Network",
+-		"action": {
+-			"type": "view",
+-			"path": "dockerman/network_new"
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/network": {
+-		"action": {
+-			"type": "alias",
+-			"path": "admin/services/dockerman/networks"
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/volumes": {
+-		"title": "Volumes",
+-		"order": 6,
+-		"action": {
+-			"type": "view",
+-			"path": "dockerman/volumes"
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/volumes/prune": {
+-		"action": {
+-			"type": "function",
+-			"module": "luci.controller.docker",
+-			"function": "volumes_prune",
+-			"post": true
+-		},
+-		"auth": {
+-			"methods": [ "cookie:sysauth_https", "cookie:sysauth_http" ],
+-			"login": true
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/docker/events": {
+-		"action": {
+-			"type": "function",
+-			"module": "luci.controller.docker",
+-			"function": "docker_events",
+-			"post": true
+-		},
+-		"auth": {
+-			"methods": [ "cookie:sysauth_https", "cookie:sysauth_http" ],
+-			"login": true
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	},
+-
+-	"admin/services/dockerman/events": {
+-		"title": "Events",
+-		"order": 7,
+-		"action": {
+-			"type": "view",
+-			"path": "dockerman/events"
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-dockerman" ]
+-		}
+-	}
+-}
+\ No newline at end of file
++  "admin/docker": {
++    "title": "Docker",
++    "order": 32,
++    "action": {
++      "type": "firstchild"
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ],
++      "fs": {
++        "/etc/init.d/dockerd": "executable",
++        "/usr/bin/dockerd": "executable"
++      },
++      "uci": {
++        "dockerd": true
++      }
++    }
++  },
++  "admin/docker/overview": {
++    "title": "Overview",
++    "order": 1,
++    "action": {
++      "type": "view",
++      "path": "dockerman/overview"
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/configuration": {
++    "title": "Configuration",
++    "order": 2,
++    "action": {
++      "type": "view",
++      "path": "dockerman/configuration"
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/container/archive/*": {
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/containers"
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/container/archive/put/*": {
++    "action": {
++      "type": "function",
++      "module": "luci.controller.docker",
++      "function": "container_put_archive"
++    },
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/container/archive/get/*": {
++    "action": {
++      "type": "function",
++      "module": "luci.controller.docker",
++      "function": "container_get_archive"
++    },
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/container/export/*": {
++    "action": {
++      "type": "function",
++      "module": "luci.controller.docker",
++      "function": "container_export"
++    },
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/container/*": {
++    "title_hide": "Container",
++    "action": {
++      "type": "view",
++      "path": "dockerman/container"
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/containers": {
++    "title": "Containers",
++    "order": 3,
++    "action": {
++      "type": "view",
++      "path": "dockerman/containers"
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/containers/prune": {
++    "action": {
++      "type": "function",
++      "module": "luci.controller.docker",
++      "function": "containers_prune",
++      "post": true
++    },
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/container": {
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/containers"
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/container_new": {
++    "title_hide": "Container",
++    "action": {
++      "type": "view",
++      "path": "dockerman/container_new"
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/images/build": {
++    "action": {
++      "type": "function",
++      "module": "luci.controller.docker",
++      "function": "image_build",
++      "post": true
++    },
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/images/build/prune": {
++    "action": {
++      "type": "function",
++      "module": "luci.controller.docker",
++      "function": "image_build_prune",
++      "post": true
++    },
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/images/get/*": {
++    "action": {
++      "type": "function",
++      "module": "luci.controller.docker",
++      "function": "image_get"
++    },
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/images/load": {
++    "action": {
++      "type": "function",
++      "module": "luci.controller.docker",
++      "function": "image_load",
++      "post": true
++    },
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/images/prune": {
++    "action": {
++      "type": "function",
++      "module": "luci.controller.docker",
++      "function": "images_prune",
++      "post": true
++    },
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/images": {
++    "title": "Images",
++    "order": 4,
++    "action": {
++      "type": "view",
++      "path": "dockerman/images"
++    }
++  },
++  "admin/docker/images/create": {
++    "action": {
++      "type": "function",
++      "module": "luci.controller.docker",
++      "function": "image_create",
++      "post": true
++    },
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/images/push/*": {
++    "action": {
++      "type": "function",
++      "module": "luci.controller.docker",
++      "function": "image_push",
++      "post": true
++    },
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/image": {
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/images"
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/network/*": {
++    "title_hide": "Network",
++    "action": {
++      "type": "view",
++      "path": "dockerman/network"
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/networks": {
++    "title": "Networks",
++    "order": 5,
++    "action": {
++      "type": "view",
++      "path": "dockerman/networks"
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/networks/prune": {
++    "action": {
++      "type": "function",
++      "module": "luci.controller.docker",
++      "function": "networks_prune",
++      "post": true
++    },
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/network_new": {
++    "title_hide": "Network",
++    "action": {
++      "type": "view",
++      "path": "dockerman/network_new"
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/network": {
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/networks"
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/volumes": {
++    "title": "Volumes",
++    "order": 6,
++    "action": {
++      "type": "view",
++      "path": "dockerman/volumes"
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/volumes/prune": {
++    "action": {
++      "type": "function",
++      "module": "luci.controller.docker",
++      "function": "volumes_prune",
++      "post": true
++    },
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/docker/events": {
++    "action": {
++      "type": "function",
++      "module": "luci.controller.docker",
++      "function": "docker_events",
++      "post": true
++    },
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/docker/events": {
++    "title": "Events",
++    "order": 7,
++    "action": {
++      "type": "view",
++      "path": "dockerman/events"
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    }
++  },
++  "admin/services/dockerman": {
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ],
++      "fs": {
++        "/etc/init.d/dockerd": "executable",
++        "/usr/bin/dockerd": "executable"
++      },
++      "uci": {
++        "dockerd": true
++      }
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker"
++    }
++  },
++  "admin/services/dockerman/overview": {
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/overview"
++    }
++  },
++  "admin/services/dockerman/configuration": {
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/configuration"
++    }
++  },
++  "admin/services/dockerman/container/archive/*": {
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/container/archive"
++    }
++  },
++  "admin/services/dockerman/container/archive/put/*": {
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/container/archive/put"
++    }
++  },
++  "admin/services/dockerman/container/archive/get/*": {
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/container/archive/get"
++    }
++  },
++  "admin/services/dockerman/container/export/*": {
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/container/export"
++    }
++  },
++  "admin/services/dockerman/container/*": {
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/container"
++    }
++  },
++  "admin/services/dockerman/containers": {
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/containers"
++    }
++  },
++  "admin/services/dockerman/containers/prune": {
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/containers/prune"
++    }
++  },
++  "admin/services/dockerman/container": {
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/container"
++    }
++  },
++  "admin/services/dockerman/container_new": {
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/container_new"
++    }
++  },
++  "admin/services/dockerman/images/build": {
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/images/build"
++    }
++  },
++  "admin/services/dockerman/images/build/prune": {
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/images/build/prune"
++    }
++  },
++  "admin/services/dockerman/images/get/*": {
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/images/get"
++    }
++  },
++  "admin/services/dockerman/images/load": {
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/images/load"
++    }
++  },
++  "admin/services/dockerman/images/prune": {
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/images/prune"
++    }
++  },
++  "admin/services/dockerman/images": {
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/images"
++    }
++  },
++  "admin/services/dockerman/images/create": {
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/images/create"
++    }
++  },
++  "admin/services/dockerman/images/push/*": {
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/images/push"
++    }
++  },
++  "admin/services/dockerman/image": {
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/image"
++    }
++  },
++  "admin/services/dockerman/network/*": {
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/network"
++    }
++  },
++  "admin/services/dockerman/networks": {
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/networks"
++    }
++  },
++  "admin/services/dockerman/networks/prune": {
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/networks/prune"
++    }
++  },
++  "admin/services/dockerman/network_new": {
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/network_new"
++    }
++  },
++  "admin/services/dockerman/network": {
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/network"
++    }
++  },
++  "admin/services/dockerman/volumes": {
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/volumes"
++    }
++  },
++  "admin/services/dockerman/volumes/prune": {
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/volumes/prune"
++    }
++  },
++  "admin/services/dockerman/docker/events": {
++    "auth": {
++      "methods": [
++        "cookie:sysauth_https",
++        "cookie:sysauth_http"
++      ],
++      "login": true
++    },
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/docker/events"
++    }
++  },
++  "admin/services/dockerman/events": {
++    "depends": {
++      "acl": [
++        "luci-app-dockerman"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/docker/events"
++    }
++  }
++}
+diff --git a/applications/luci-app-frpc/root/usr/share/luci/menu.d/luci-app-frpc.json b/applications/luci-app-frpc/root/usr/share/luci/menu.d/luci-app-frpc.json
+index f6eaf4a9..e091d5d1 100644
+--- a/applications/luci-app-frpc/root/usr/share/luci/menu.d/luci-app-frpc.json
++++ b/applications/luci-app-frpc/root/usr/share/luci/menu.d/luci-app-frpc.json
+@@ -1,12 +1,26 @@
+ {
+-	"admin/services/frpc": {
+-		"title": "frp Client",
+-		"action": {
+-			"type": "view",
+-			"path": "frpc"
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-frpc" ]
+-		}
+-	}
++  "admin/vpn/frpc": {
++    "title": "frp Client",
++    "action": {
++      "type": "view",
++      "path": "frpc"
++    },
++    "depends": {
++      "acl": [
++        "luci-app-frpc"
++      ]
++    },
++    "order": 100
++  },
++  "admin/services/frpc": {
++    "depends": {
++      "acl": [
++        "luci-app-frpc"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/vpn/frpc"
++    }
++  }
+ }
+diff --git a/applications/luci-app-frps/root/usr/share/luci/menu.d/luci-app-frps.json b/applications/luci-app-frps/root/usr/share/luci/menu.d/luci-app-frps.json
+index 448cb7a4..4df8085d 100644
+--- a/applications/luci-app-frps/root/usr/share/luci/menu.d/luci-app-frps.json
++++ b/applications/luci-app-frps/root/usr/share/luci/menu.d/luci-app-frps.json
+@@ -1,12 +1,26 @@
+ {
+-	"admin/services/frps": {
+-		"title": "frp Server",
+-		"action": {
+-			"type": "view",
+-			"path": "frps"
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-frps" ]
+-		}
+-	}
++  "admin/vpn/frps": {
++    "title": "frp Server",
++    "action": {
++      "type": "view",
++      "path": "frps"
++    },
++    "depends": {
++      "acl": [
++        "luci-app-frps"
++      ]
++    },
++    "order": 110
++  },
++  "admin/services/frps": {
++    "depends": {
++      "acl": [
++        "luci-app-frps"
++      ]
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/vpn/frps"
++    }
++  }
+ }
+diff --git a/applications/luci-app-netdata/root/usr/share/luci/menu.d/luci-app-netdata.json b/applications/luci-app-netdata/root/usr/share/luci/menu.d/luci-app-netdata.json
+index 3753ff6d..d59bf29f 100644
+--- a/applications/luci-app-netdata/root/usr/share/luci/menu.d/luci-app-netdata.json
++++ b/applications/luci-app-netdata/root/usr/share/luci/menu.d/luci-app-netdata.json
+@@ -1,13 +1,26 @@
+ {
+-	"admin/system/netdata": {
+-		"title": "Netdata",
+-		"order": 10,
+-		"action": {
+-			"type": "view",
+-			"path": "netdata"
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-netdata" ]
+-		}
+-	}
++  "admin/status/netdata": {
++    "title": "Netdata",
++    "order": 10000,
++    "action": {
++      "type": "view",
++      "path": "netdata"
++    },
++    "depends": {
++      "acl": [
++        "luci-app-netdata"
++      ]
++    }
++  },
++  "admin/system/netdata": {
++    "action": {
++      "type": "alias",
++      "path": "admin/status/netdata"
++    },
++    "depends": {
++      "acl": [
++        "luci-app-netdata"
++      ]
++    }
++  }
+ }
+diff --git a/applications/luci-app-openlist/root/usr/share/luci/menu.d/luci-app-openlist.json b/applications/luci-app-openlist/root/usr/share/luci/menu.d/luci-app-openlist.json
+index cdbfcc1a..4e10ad2e 100644
+--- a/applications/luci-app-openlist/root/usr/share/luci/menu.d/luci-app-openlist.json
++++ b/applications/luci-app-openlist/root/usr/share/luci/menu.d/luci-app-openlist.json
+@@ -1,28 +1,59 @@
+ {
+-	"admin/services/openlist": {
+-		"title": "OpenList",
+-		"action": {
+-			"type": "firstchild"
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-openlist" ],
+-			"uci": { "openlist": true }
+-		}
+-	},
+-	"admin/services/openlist/config": {
+-		"title": "Settings",
+-		"order": 10,
+-		"action": {
+-			"type": "view",
+-			"path": "openlist/config"
+-		}
+-	},
+-	"admin/services/openlist/log": {
+-		"title": "Log",
+-		"order": 20,
+-		"action": {
+-			"type": "view",
+-			"path": "openlist/log"
+-		}
+-	}
++  "admin/nas/openlist": {
++    "title": "OpenList",
++    "action": {
++      "type": "firstchild"
++    },
++    "depends": {
++      "acl": [
++        "luci-app-openlist"
++      ],
++      "uci": {
++        "openlist": true
++      }
++    },
++    "order": 50
++  },
++  "admin/nas/openlist/config": {
++    "title": "Settings",
++    "order": 10,
++    "action": {
++      "type": "view",
++      "path": "openlist/config"
++    }
++  },
++  "admin/nas/openlist/log": {
++    "title": "Log",
++    "order": 20,
++    "action": {
++      "type": "view",
++      "path": "openlist/log"
++    }
++  },
++  "admin/services/openlist": {
++    "depends": {
++      "acl": [
++        "luci-app-openlist"
++      ],
++      "uci": {
++        "openlist": true
++      }
++    },
++    "action": {
++      "type": "alias",
++      "path": "admin/nas/openlist"
++    }
++  },
++  "admin/services/openlist/config": {
++    "action": {
++      "type": "alias",
++      "path": "admin/nas/openlist/config"
++    }
++  },
++  "admin/services/openlist/log": {
++    "action": {
++      "type": "alias",
++      "path": "admin/nas/openlist/log"
++    }
++  }
+ }
+diff --git a/applications/luci-app-tailscale-community/root/usr/share/luci/menu.d/luci-app-tailscale-community.json b/applications/luci-app-tailscale-community/root/usr/share/luci/menu.d/luci-app-tailscale-community.json
+index 70c90695..85874db9 100644
+--- a/applications/luci-app-tailscale-community/root/usr/share/luci/menu.d/luci-app-tailscale-community.json
++++ b/applications/luci-app-tailscale-community/root/usr/share/luci/menu.d/luci-app-tailscale-community.json
+@@ -1,10 +1,16 @@
+ {
+-	"admin/services/tailscale": {
+-		"title": "Tailscale",
+-		"order": 90,
+-		"action": {
+-			"type": "view",
+-			"path": "tailscale"
+-		}
+-	}
++  "admin/vpn/tailscale": {
++    "title": "Tailscale",
++    "order": 80,
++    "action": {
++      "type": "view",
++      "path": "tailscale"
++    }
++  },
++  "admin/services/tailscale": {
++    "action": {
++      "type": "alias",
++      "path": "admin/vpn/tailscale"
++    }
++  }
+ }
+diff --git a/applications/luci-app-upnp/root/usr/share/luci/menu.d/luci-app-upnp.json b/applications/luci-app-upnp/root/usr/share/luci/menu.d/luci-app-upnp.json
+index 80250be5..5bf014db 100644
+--- a/applications/luci-app-upnp/root/usr/share/luci/menu.d/luci-app-upnp.json
++++ b/applications/luci-app-upnp/root/usr/share/luci/menu.d/luci-app-upnp.json
+@@ -1,13 +1,18 @@
+ {
+-	"admin/services/upnp": {
+-		"title": "UPnP IGD & PCP",
+-		"action": {
+-			"type": "view",
+-			"path": "upnp/upnp"
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-upnp" ],
+-			"uci": { "upnpd": true }
+-		}
+-	}
++  "admin/services/upnp": {
++    "title": "UPnP IGD & PCP",
++    "action": {
++      "type": "view",
++      "path": "upnp/upnp"
++    },
++    "depends": {
++      "acl": [
++        "luci-app-upnp"
++      ],
++      "uci": {
++        "upnpd": true
++      }
++    },
++    "order": 1003
++  }
+ }
+diff --git a/applications/luci-app-vlmcsd/root/usr/share/luci/menu.d/luci-app-vlmcsd.json b/applications/luci-app-vlmcsd/root/usr/share/luci/menu.d/luci-app-vlmcsd.json
+index 0e39d955..8c3cfa05 100644
+--- a/applications/luci-app-vlmcsd/root/usr/share/luci/menu.d/luci-app-vlmcsd.json
++++ b/applications/luci-app-vlmcsd/root/usr/share/luci/menu.d/luci-app-vlmcsd.json
+@@ -1,13 +1,18 @@
+ {
+-	"admin/services/vlmcsd": {
+-		"title": "Vlmcsd KMS Server",
+-		"action": {
+-			"type": "view",
+-			"path": "vlmcsd"
+-		},
+-		"depends": {
+-			"acl": [ "luci-app-vlmcsd" ],
+-			"uci": { "vlmcsd": true }
+-		}
+-	}
++  "admin/services/vlmcsd": {
++    "title": "Vlmcsd KMS Server",
++    "action": {
++      "type": "view",
++      "path": "vlmcsd"
++    },
++    "depends": {
++      "acl": [
++        "luci-app-vlmcsd"
++      ],
++      "uci": {
++        "vlmcsd": true
++      }
++    },
++    "order": 1002
++  }
+ }

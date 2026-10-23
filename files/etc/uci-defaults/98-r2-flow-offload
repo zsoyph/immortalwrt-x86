@@ -1,0 +1,5 @@
+#!/bin/sh
+uci -q set firewall.@defaults[0].flow_offloading_hw='0'
+uci -q set firewall.@defaults[0].flow_offloading='0'
+uci -q commit firewall
+exit 0

@@ -1,0 +1,32 @@
+{
+  "checked": "2026-10-23T10:08:08.042174+08:00",
+  "build_finished": "2026-10-23T10:01:11.017761+08:00",
+  "runtime_finished": "2026-10-23T10:07:13.837665+08:00",
+  "modes": {
+    "bios-virtio": {
+      "translated_strings_verified": 35,
+      "all_chinese_translations_in_http_resource": true,
+      "lan": true,
+      "adguard_page_http200": true,
+      "unknown_version_translatable": true
+    },
+    "uefi-virtio": {
+      "translated_strings_verified": 35,
+      "all_chinese_translations_in_http_resource": true,
+      "lan": true,
+      "adguard_page_http200": true,
+      "unknown_version_translatable": true
+    }
+  },
+  "translation_entries": 36,
+  "identity_strings_preserved": [
+    "AdGuard Home"
+  ],
+  "scope": "LuCI AdGuardHome plugin; not independent AdGuardHome web console",
+  "limits": [
+    "No graphical browser screenshot test; verified actual translation response and page JS",
+    "AdGuardHome daemon/DNS configuration unchanged and not enabled",
+    "Other plugins not functionally retested this revision",
+    "Previous HTTPS default disabled, squashfs Docker storage limit, OpenClash core missing and actual fnOS LAN investigation remain unchanged"
+  ]
+}

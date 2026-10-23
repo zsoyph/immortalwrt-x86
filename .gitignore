@@ -1,0 +1,8 @@
+/work/
+/output/
+/logs/
+__pycache__/
+*.pyc
+*.partial
+*.pem
+.env
