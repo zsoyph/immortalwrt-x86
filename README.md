@@ -4,7 +4,7 @@
 
 以已验收的 **2026-10-23 r4** 为基线：ImmortalWrt **25.12.2**、Linux **6.12.103**、x86/64，标准 Bandix、AdGuard Home LuCI 简体中文、firewall4/nftables、dae eBPF 支持。
 
-这是配置、补丁和构建自动化仓库。15 个上游源码仓库均锁定完整提交，不随分支漂移；没有将编译主机、登录凭据、用户代理订阅或临时会话放进仓库。
+这是配置、补丁和构建自动化仓库。16 个上游源码仓库均锁定完整提交，不随分支漂移；没有将编译主机、登录凭据、用户代理订阅或临时会话放进仓库。
 
 ## 开始云编译
 
@@ -24,7 +24,7 @@
 | 平台 | x86/64 generic |
 | 镜像 | ext4、squashfs，各提供 BIOS 和 UEFI 整盘镜像 |
 | 分区 | 128 MiB 引导分区 + 4096 MiB 根分区 |
-| LAN | `192.168.1.1/24`，管理地址 `http://192.168.1.1` |
+| LAN | `192.168.101.80/24`，管理地址 `http://192.168.101.80` |
 | 登录 | `root`，初始密码为空，首次登录后设置 |
 | 防火墙 | firewall4 + nftables；允许 iptables-nft 兼容层，禁止 legacy |
 | eBPF | BPF/JIT、BTF、cgroup、TC/XDP 相关能力 |
@@ -36,14 +36,14 @@
 
 ## 插件与菜单
 
-成品基线共 659 个软件包、38 个 LuCI 应用；配置中 687 个包相关符号还包含构建/变体选项，不等于成品包数。完整清单见 [manifest](docs/baseline-r4/firmware.manifest)。
+成品基线共 662 个软件包、39 个 LuCI 应用；配置中 690 个包相关符号还包含构建/变体选项，不等于成品包数。完整清单见 [manifest](docs/baseline-r4/firmware.manifest)。
 
 | 分类 | 主要应用 |
 | --- | --- |
 | 状态 | 系统默认状态项，Netdata 位于末项 |
 | 系统 | 软件包管理、Argon 主题配置、终端、计划重启、关机（PowerOff）、一键分区扩容（Partition Expansion）等 |
 | 服务 | AdGuard Home、SmartDNS、DDNS、DDNS-Go、HomeProxy、OpenClash、PassWall、Nikki、DAE/DAED、vlmcsd、UPnP |
-| VPN | OpenVPN、Tailscale、ZeroTier、FRP 客户端、FRP 服务端；同时保留 WireGuard 协议支持 |
+| VPN | OpenVPN、Tailscale、ZeroTier、FRP 客户端、FRP 服务端、EasyTier；同时保留 WireGuard 协议支持 |
 | NAS | 磁盘管理、文件管理、Samba4、SMB/CIFS 远程挂载、OpenList、Aria2、MiniDLNA |
 | Docker | 独立一级菜单 |
 | 网络 | 接口、路由、防火墙、SQM、多 WAN、wrtbwmon、标准 Bandix（状态/连接/DNS/设置） |
@@ -73,7 +73,7 @@ bash scripts/build.sh /path/to/new-work
 
 ## 验证与已知限制
 
-云端本次构建会检查：四种镜像分区和 SHA256、成品 manifest、38 个应用、移除项、eBPF 内核标志、实际 rootfs 中的 AdGuard Home LMO 和脚本。只有校验通过才生成固件下载包。
+云端本次构建会检查：四种镜像分区和 SHA256、成品 manifest、39 个应用、移除项、eBPF 内核标志、实际 rootfs 中的 AdGuard Home LMO 和脚本。只有校验通过才生成固件下载包。
 
 历史本地 r4 已通过 BIOS/UEFI VirtIO 隔离启动、br-lan/LAN、LuCI 页面和实际返回的 35 条中文译文验证，见 [测试报告](docs/baseline-r4/test-report.zh-CN.md)。**每次云构建不会继承这份历史报告作为运行验收结果**，输出 JSON 明确记录本次未运行的启动/HTTP 测试。
 

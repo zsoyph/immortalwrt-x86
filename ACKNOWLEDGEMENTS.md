@@ -15,6 +15,7 @@
 | [luci-app-wrtbwmon](https://github.com/brvphoenix/luci-app-wrtbwmon)、[wrtbwmon](https://github.com/brvphoenix/wrtbwmon) | 实时带宽统计 |
 | [luci-app-poweroffdevice](https://github.com/sirpdboy/luci-app-poweroffdevice) | 系统菜单下的关机/重启 Web 入口 |
 | [luci-app-partexp](https://github.com/sirpdboy/luci-app-partexp) | 一键分区格式化、扩容与自动挂载 |
+| [luci-app-easytier](https://github.com/EasyTier/luci-app-easytier)、[EasyTier](https://github.com/EasyTier/EasyTier) | VPN 菜单下的 EasyTier 组网插件及官方预编译内核程序 |
 | [AdGuard Home](https://github.com/AdguardTeam/AdGuardHome) | DNS 过滤服务；本项目补充其 LuCI 插件中文翻译 |
 | [Open-Box](https://github.com/liandu2024/Open-Box) | 用户选择的官方后安装项目，本固件未打包 |
 | [GitHub Actions](https://github.com/features/actions) | 云编译执行环境 |

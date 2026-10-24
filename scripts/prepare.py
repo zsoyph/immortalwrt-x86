@@ -63,6 +63,8 @@ def main():
         'luci-app-quickstart': paths['nas-luci'] / 'luci/luci-app-quickstart',
         'luci-app-poweroffdevice': paths['poweroffdevice'] / 'luci-app-poweroffdevice',
         'luci-app-partexp': paths['partexp'] / 'luci-app-partexp',
+        'luci-app-easytier': paths['easytier'] / 'luci-app-easytier',
+        'easytier-noweb': paths['easytier'] / 'easytier-noweb',
     }
     custom = core / 'package/custom'
     custom.mkdir(parents=True)
@@ -85,7 +87,7 @@ def main():
     resolved = (core / '.config').read_text(encoding='utf-8')
     missing, extra = selected(seed) - selected(resolved), selected(resolved) - selected(seed)
     assert not missing and not extra, {'packages_missing': sorted(missing), 'packages_extra': sorted(extra)}
-    assert len([name for name in selected(resolved) if name.startswith('luci-app-') and '_' not in name]) == 38
+    assert len([name for name in selected(resolved) if name.startswith('luci-app-') and '_' not in name]) == 39
     assert 'CONFIG_TARGET_ROOTFS_PARTSIZE=4096' in resolved
     assert 'CONFIG_TARGET_KERNEL_PARTSIZE=128' in resolved
     (work / 'preparation.json').write_text(json.dumps({

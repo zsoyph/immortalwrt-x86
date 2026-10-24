@@ -64,6 +64,10 @@
     "partexp": {
       "url": "https://github.com/sirpdboy/luci-app-partexp.git",
       "commit": "236187cfe4f1fab7f2dde5279ce378324c3e5f40"
+    },
+    "easytier": {
+      "url": "https://github.com/EasyTier/luci-app-easytier.git",
+      "commit": "9c51d3f8d2bfcefd039f2ff2354c6a7674293a06"
     }
   }
 }
