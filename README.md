@@ -24,7 +24,7 @@
 | 平台 | x86/64 generic |
 | 镜像 | ext4、squashfs，各提供 BIOS 和 UEFI 整盘镜像 |
 | 分区 | 128 MiB 引导分区 + 4096 MiB 根分区 |
-| LAN | `192.168.101.80/24`，管理地址 `http://192.168.101.80` |
+| LAN | `192.168.1.1/24`，管理地址 `http://192.168.1.1` |
 | 登录 | `root`，初始密码为空，首次登录后设置 |
 | 防火墙 | firewall4 + nftables；允许 iptables-nft 兼容层，禁止 legacy |
 | eBPF | BPF/JIT、BTF、cgroup、TC/XDP 相关能力 |

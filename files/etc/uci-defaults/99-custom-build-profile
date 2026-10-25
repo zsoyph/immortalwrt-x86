@@ -3,9 +3,6 @@
 uci -q set system.@system[0].timezone='CST-8'
 uci -q set system.@system[0].zonename='Asia/Shanghai'
 uci -q commit system
-# LAN defaults to 192.168.101.80 to fit the home subnet.
-uci -q set network.lan.ipaddr='192.168.101.80'
-uci -q commit network
 for service in bandix vlmcsd nikki wrtbwmon sqm mwan3 miniupnpd ddns ddns-go smartdns AdGuardHome adguardhome homeproxy openclash passwall dae daed openvpn tailscale zerotier frpc frps dockerd samba4 aria2 openlist minidlna netdata autoreboot banip; do
     if [ -x "/etc/init.d/$service" ]; then
         "/etc/init.d/$service" disable
