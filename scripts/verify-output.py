@@ -46,6 +46,7 @@ def main():
     required_apps |= {'luci-app-bbr', 'luci-app-partexp', 'luci-app-poweroffdevice', 'luci-app-easytier'}
     assert required_apps <= names, sorted(required_apps - names)
     assert {'kmod-tcp-bbr', 'kmod-sched', 'kmod-lib-textsearch', 'bandix', 'dae', 'daed', 'firewall4', 'nftables-json', 'iptables-nft', 'ip6tables-nft', 'kmod-fs-cifs', 'vlmcsd', 'luci-i18n-adguardhome-zh-cn'} <= names
+    assert {'luci-i18n-partexp-zh-cn', 'luci-i18n-poweroffdevice-zh-cn'} <= names
     removed = {'luci-app-acme', 'luci-app-https-dns-proxy', 'luci-app-irqbalance', 'luci-app-banip', 'luci-app-passwall2', 'luci-app-transmission', 'luci-app-nlbwmon', 'luci-app-adblock-fast'}
     assert not names & removed
     assert not any('bandix-plus' in name or ('tables' in name and 'legacy' in name) for name in names)
@@ -64,6 +65,11 @@ def main():
     flags = ['BPF', 'BPF_SYSCALL', 'BPF_JIT', 'DEBUG_INFO_BTF', 'CGROUP_BPF', 'NET_CLS_BPF', 'NET_ACT_BPF', 'TCP_CONG_BBR', 'NET_SCH_FQ']
     assert all(re.search(r'^CONFIG_' + flag + r'=[ym]$', text, re.M) for flag in flags)
     root = core / 'build_dir/target-x86_64_musl/root-x86'
+    for app in ['partexp', 'poweroffdevice']:
+        menu = root / f'usr/share/luci/menu.d/luci-app-{app}.json'
+        assert f'admin/system/{app}' in json.loads(menu.read_text(encoding='utf-8')), app
+        translation = root / f'usr/lib/lua/luci/i18n/{app}.zh-cn.lmo'
+        assert translation.is_file() and translation.stat().st_size > 0, app
     for relative in ['etc/config/bbr', 'etc/init.d/bbr', 'usr/share/luci/menu.d/luci-app-bbr.json', 'usr/share/rpcd/acl.d/luci-app-bbr.json', 'www/luci-static/resources/view/network/bbr.js']:
         assert (root / relative).is_file(), relative
     assert list((root / 'etc/rc.d').glob('S99bbr')), 'BBR boot service must be enabled'

@@ -14,6 +14,7 @@ for name, source in lock['repositories'].items():
 config = (root / 'configs/x86-64.config').read_text(encoding='utf-8')
 selected = set(re.findall(r'^CONFIG_PACKAGE_([^=]+)=y$', config, re.M))
 assert len(selected) == 694, len(selected)
+assert {'luci-app-partexp', 'luci-app-poweroffdevice', 'luci-i18n-partexp-zh-cn', 'luci-i18n-poweroffdevice-zh-cn'} <= selected, 'Partition expansion and poweroff with Chinese translations are required'
 for makefile in (root / 'packages').glob('*/Makefile'):
     recipe = makefile.read_text(encoding='utf-8')
     assert re.search(r'\b(?:BuildPackage|KernelPackage)\b', recipe), f'Missing OpenWrt package scan signature: {makefile}'

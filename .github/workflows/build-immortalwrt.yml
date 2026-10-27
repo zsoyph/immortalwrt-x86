@@ -1,4 +1,4 @@
-name: Build ImmortalWrt x86 r4 BBR
+name: Build ImmortalWrt x86 BBR + Expansion + PowerOff
 
 on:
   workflow_dispatch:
@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   build:
-    name: Locked r4 / x86-64 / BIOS + UEFI
+    name: BBR + partexp + poweroff / x86-64 / BIOS + UEFI
     runs-on: ubuntu-24.04
     timeout-minutes: 360
     env:
