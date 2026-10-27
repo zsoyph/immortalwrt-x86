@@ -12,3 +12,5 @@ define Package/luci-app-bbr/conffiles
 endef
 
 include $(TOPDIR)/feeds/luci/luci.mk
+
+# call BuildPackage - OpenWrt buildroot signature

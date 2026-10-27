@@ -14,6 +14,9 @@ for name, source in lock['repositories'].items():
 config = (root / 'configs/x86-64.config').read_text(encoding='utf-8')
 selected = set(re.findall(r'^CONFIG_PACKAGE_([^=]+)=y$', config, re.M))
 assert len(selected) == 694, len(selected)
+for makefile in (root / 'packages').glob('*/Makefile'):
+    recipe = makefile.read_text(encoding='utf-8')
+    assert re.search(r'\b(?:BuildPackage|KernelPackage)\b', recipe), f'Missing OpenWrt package scan signature: {makefile}'
 assert len([name for name in selected if name.startswith('luci-app-') and '_' not in name]) == 40
 assert {'luci-i18n-adguardhome-zh-cn', 'luci-app-bbr', 'kmod-tcp-bbr', 'kmod-sched', 'kmod-lib-textsearch'} <= selected
 assert not any('bandix-plus' in name or ('tables' in name and 'legacy' in name) for name in selected)
