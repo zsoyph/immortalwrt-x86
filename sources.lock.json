@@ -68,6 +68,10 @@
     "easytier": {
       "url": "https://github.com/EasyTier/luci-app-easytier.git",
       "commit": "9c51d3f8d2bfcefd039f2ff2354c6a7674293a06"
+    },
+    "turboacc": {
+      "url": "https://github.com/chenmozhijin/turboacc.git",
+      "commit": "530092c532839efb96e9f328d34dbf3adff4b557"
     }
   }
 }

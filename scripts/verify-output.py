@@ -43,15 +43,16 @@ def main():
     subprocess.run(['sha256sum', '-c', 'sha256sums'], cwd=target, check=True)
     names = {line.split(' - ')[0] for line in next(target.glob('*.manifest')).read_text(encoding='utf-8').splitlines()}
     required_apps = {line.split(' - ')[0] for line in (PROJECT / 'docs/baseline-r4/firmware.manifest').read_text(encoding='utf-8').splitlines() if line.startswith('luci-app-')}
-    required_apps |= {'luci-app-bbr', 'luci-app-partexp', 'luci-app-poweroffdevice', 'luci-app-easytier'}
+    required_apps |= {'luci-app-turboacc', 'luci-app-partexp', 'luci-app-poweroffdevice', 'luci-app-easytier'}
     assert required_apps <= names, sorted(required_apps - names)
     assert {'kmod-tcp-bbr', 'kmod-sched', 'kmod-lib-textsearch', 'bandix', 'dae', 'daed', 'firewall4', 'nftables-json', 'iptables-nft', 'ip6tables-nft', 'kmod-fs-cifs', 'vlmcsd', 'luci-i18n-adguardhome-zh-cn'} <= names
     assert {'luci-i18n-partexp-zh-cn', 'luci-i18n-poweroffdevice-zh-cn'} <= names
-    removed = {'luci-app-acme', 'luci-app-https-dns-proxy', 'luci-app-irqbalance', 'luci-app-banip', 'luci-app-passwall2', 'luci-app-transmission', 'luci-app-nlbwmon', 'luci-app-adblock-fast'}
+    assert {'luci-i18n-turboacc-zh-cn', 'kmod-nft-fullcone', 'kmod-nft-offload'} <= names
+    removed = {'luci-app-bbr', 'luci-app-acme', 'luci-app-https-dns-proxy', 'luci-app-irqbalance', 'luci-app-banip', 'luci-app-passwall2', 'luci-app-transmission', 'luci-app-nlbwmon', 'luci-app-adblock-fast'}
     assert not names & removed
     assert not any('bandix-plus' in name or ('tables' in name and 'legacy' in name) for name in names)
     assert len(required_apps) == 40
-    assert len(names) == 666, f'Unexpected manifest package count: {len(names)}'
+    assert len(names) == 667, f'Unexpected manifest package count: {len(names)}'
     images = []
     for filesystem in ['ext4', 'squashfs']:
         for boot in ['combined', 'combined-efi']:
@@ -70,9 +71,17 @@ def main():
         assert f'admin/system/{app}' in json.loads(menu.read_text(encoding='utf-8')), app
         translation = root / f'usr/lib/lua/luci/i18n/{app}.zh-cn.lmo'
         assert translation.is_file() and translation.stat().st_size > 0, app
-    for relative in ['etc/config/bbr', 'etc/init.d/bbr', 'usr/share/luci/menu.d/luci-app-bbr.json', 'usr/share/rpcd/acl.d/luci-app-bbr.json', 'www/luci-static/resources/view/network/bbr.js']:
+    for relative in ['etc/config/turboacc', 'etc/init.d/turboacc', 'usr/lib/lua/luci/controller/turboacc.lua', 'usr/lib/lua/luci/model/cbi/turboacc.lua', 'usr/lib/lua/luci/i18n/turboacc.zh-cn.lmo']:
         assert (root / relative).is_file(), relative
-    assert list((root / 'etc/rc.d').glob('S99bbr')), 'BBR boot service must be enabled'
+    assert list((root / 'etc/rc.d').glob('S90turboacc')), 'TurboACC boot service must be enabled'
+    for relative in ['etc/init.d/bbr', 'etc/config/bbr', 'www/luci-static/resources/view/network/bbr.js', 'usr/share/luci/menu.d/luci-app-bbr.json']:
+        assert not (root / relative).exists(), relative
+    config = (root / 'etc/config/turboacc').read_text(encoding='utf-8')
+    for name in ['sw_flow', 'hw_flow', 'sfe_flow']:
+        assert "option " + name + " '0'" in config, name
+    assert "option fullcone_nat '1'" in config and "option bbr_cca '1'" in config
+    init = (root / 'etc/init.d/turboacc').read_text(encoding='utf-8')
+    assert 'firewall.@defaults[0].fullcone6' in init
     lmo = root / 'usr/lib/lua/luci/i18n/adguardhome.zh-cn.lmo'
     assert lmo.is_file() and lmo.stat().st_size > 0
     view = root / 'www/luci-static/resources/view/adguardhome/config.js'
@@ -87,7 +96,7 @@ def main():
     shutil.copy2(PROJECT / 'sources.lock.json', output / 'sources.lock.json')
     shutil.copy2(lmo, output / lmo.name)
     report = {'checked': datetime.datetime.now(datetime.timezone.utc).isoformat(),
-              'baseline': '20261023-r4', 'packages': len(names), 'luci_apps': len(required_apps),
+              'baseline': '20261023-r4', 'profile': '20261027-r6-turboacc', 'packages': len(names), 'luci_apps': len(required_apps),
               'images': images, 'kernel_flags_verified': flags, 'adguardhome_lmo_in_rootfs': True,
               'runtime_boot_tested_this_build': False, 'runtime_translation_http_tested_this_build': False}
     (output / 'build-verification.json').write_text(json.dumps(report, indent=2))

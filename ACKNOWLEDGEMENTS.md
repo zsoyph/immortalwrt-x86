@@ -18,6 +18,7 @@
 | [luci-app-easytier](https://github.com/EasyTier/luci-app-easytier)、[EasyTier](https://github.com/EasyTier/EasyTier) | VPN 菜单下的 EasyTier 组网插件及官方预编译内核程序 |
 | [AdGuard Home](https://github.com/AdguardTeam/AdGuardHome) | DNS 过滤服务；本项目补充其 LuCI 插件中文翻译 |
 | [Open-Box](https://github.com/liandu2024/Open-Box) | 用户选择的官方后安装项目，本固件未打包 |
+| [TurboACC](https://github.com/chenmozhijin/turboacc) | firewall4 专用 TurboACC；本项目做原生 ImmortalWrt 规则和默认开关适配，保留 GPL-3.0 许可证 |
 | [GitHub Actions](https://github.com/features/actions) | 云编译执行环境 |
 
 此外感谢内核、netfilter/nftables、Docker、Samba、OpenList、FRP、Tailscale、ZeroTier、WireGuard、OpenVPN、Nikki、OpenClash、PassWall、Argon 等所有被集成组件的上游作者。软件包的具体许可证以各包源码和安装文件为准。

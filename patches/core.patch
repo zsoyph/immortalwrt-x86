@@ -18,3 +18,12 @@ index 77646c0..e08a844 100644
 +CONFIG_KPROBES=y
 +CONFIG_PERF_EVENTS=y
 +CONFIG_XDP_SOCKETS=y
+diff --git a/include/image.mk b/include/image.mk
+--- a/include/image.mk
++++ b/include/image.mk
+@@ -211,3 +211,4 @@
+ define Image/pad-to
+-	dd if=$(1) of=$(1).new bs=$(2) conv=sync
++	cp --sparse=always $(1) $(1).new
++	truncate -s %$(2) $(1).new
+ 	mv $(1).new $(1)

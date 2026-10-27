@@ -1,4 +1,4 @@
-name: Build ImmortalWrt x86 BBR + Expansion + PowerOff
+name: Build ImmortalWrt x86 r6 TurboACC
 
 on:
   workflow_dispatch:
@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   build:
-    name: BBR + partexp + poweroff / x86-64 / BIOS + UEFI
+    name: r6 TurboACC + partexp + poweroff / x86-64 / BIOS + UEFI
     runs-on: ubuntu-24.04
     timeout-minutes: 360
     env:
@@ -38,6 +38,7 @@ jobs:
       - name: Check project inputs
         run: |
           python3 scripts/check-project.py
+          python3 scripts/check-padding.py
           bash -n scripts/build.sh scripts/install-dependencies.sh
 
       - name: Prepare hosted runner disk
@@ -80,7 +81,7 @@ jobs:
       - name: Upload verified firmware, manifest and checksums
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
-          name: immortalwrt-25.12.2-x86-64-r4-bbr-${{ github.run_number }}
+          name: immortalwrt-25.12.2-x86-64-r6-turboacc-${{ github.run_number }}
           path: output/
           compression-level: 0
           if-no-files-found: error
@@ -90,7 +91,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
-          name: build-logs-r4-${{ github.run_number }}
+          name: build-logs-r6-turboacc-${{ github.run_number }}
           path: |
             logs/
             work/preparation.json
@@ -104,8 +105,8 @@ jobs:
         if: always()
         run: |
           {
-            echo '## ImmortalWrt x86 r4'
-            echo 'Baseline: 25.12.2 / Linux 6.12.103 / standard Bandix / AdGuard Home LuCI 简体中文'
+            echo '## ImmortalWrt x86 r6 TurboACC'
+            echo 'Baseline: 25.12.2 / Linux 6.12.103 / standard Bandix / AdGuard Home LuCI 简体中文 / TurboACC fw4 fullcone'
             echo 'Firmware is available only when compile and artifact verification succeeded.'
             echo 'Cloud checks verify images, manifest, selected apps, eBPF flags and LMO packaging.'
             echo 'Historical local BIOS/UEFI/Chinese HTTP tests are documented separately; this run does not claim them.'

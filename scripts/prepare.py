@@ -68,7 +68,15 @@ def main():
     }
     custom = core / 'package/custom'
     custom.mkdir(parents=True)
-    shutil.copytree(PROJECT / 'packages/luci-app-bbr', custom / 'luci-app-bbr')
+    run(['git', 'apply', '--check', str(PROJECT / 'docs/turboacc-immortalwrt-adaptation.diff')], paths['turboacc'])
+    run(['git', 'apply', str(PROJECT / 'docs/turboacc-immortalwrt-adaptation.diff')], paths['turboacc'])
+    # Verify the vendored recipe against the pinned upstream plus recorded adaptation.
+    for file in (PROJECT / 'packages/luci-app-turboacc').rglob('*'):
+        if file.is_file():
+            relative = file.relative_to(PROJECT / 'packages/luci-app-turboacc')
+            upstream = paths['turboacc'] / ('LICENSE' if str(relative) == 'LICENSE' else 'luci-app-turboacc/' + relative.as_posix())
+            assert file.read_bytes() == upstream.read_bytes(), str(relative)
+    shutil.copytree(PROJECT / 'packages/luci-app-turboacc', custom / 'luci-app-turboacc')
     for name, source in links.items():
         assert (source / 'Makefile').is_file() or name in ['nikki', 'daede', 'istore', 'wrtbwmon-luci'], source
         (custom / name).symlink_to(source, target_is_directory=True)
@@ -79,7 +87,7 @@ def main():
             if link.is_symlink():
                 link.unlink()
     shutil.copytree(PROJECT / 'files', core / 'files', dirs_exist_ok=True)
-    for file in (custom / 'luci-app-bbr/root/etc').glob('*/*'):
+    for file in (custom / 'luci-app-turboacc/root/etc').glob('*/*'):
         if file.is_file() and file.parent.name in ['init.d', 'uci-defaults']:
             file.chmod(0o755)
     for file in (core / 'files/etc/uci-defaults').iterdir():

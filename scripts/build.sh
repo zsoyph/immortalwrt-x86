@@ -17,11 +17,13 @@ for stage in tools/install toolchain/install; do
         make -j1 "$stage" V=s 2>&1 | tee "$project/logs/$label-retry.log"
     fi
 done
-# Let the standard world target prepare/configure the kernel before packages.
-# bpf-headers reads the target kernel .config, which does not exist yet on a
-# clean runner even after tools/install and toolchain/install have completed.
-if ! make -j"$jobs" V=s 2>&1 | tee "$project/logs/build.log"; then
-    make -j1 V=s 2>&1 | tee "$project/logs/build-retry.log"
-fi
+# Compile the kernel and packages in parallel; serialize final image packaging.
+for stage in target/compile package/compile; do
+    label=${stage//\//-}
+    if ! make -j"$jobs" "$stage" V=s 2>&1 | tee "$project/logs/$label.log"; then
+        make -j1 "$stage" V=s 2>&1 | tee "$project/logs/$label-retry.log"
+    fi
+done
+make -j1 V=s 2>&1 | tee "$project/logs/build.log"
 make -j1 package/kernel/bpf-headers/compile V=s 2>&1 | tee "$project/logs/bpf-headers.log"
 python3 "$project/scripts/verify-output.py" --work "$work" --output "$project/output"

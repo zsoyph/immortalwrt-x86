@@ -1,2 +1,0 @@
-config bbr 'main'
-	option enabled '1'
