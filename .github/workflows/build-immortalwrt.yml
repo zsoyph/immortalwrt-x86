@@ -1,4 +1,4 @@
-name: Build ImmortalWrt x86 r4
+name: Build ImmortalWrt x86 r4 BBR
 
 on:
   workflow_dispatch:
@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/build-immortalwrt.yml'
+      - 'packages/**'
       - 'configs/**'
       - 'files/**'
       - 'patches/**'
@@ -79,7 +80,7 @@ jobs:
       - name: Upload verified firmware, manifest and checksums
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
-          name: immortalwrt-25.12.2-x86-64-r4-${{ github.run_number }}
+          name: immortalwrt-25.12.2-x86-64-r4-bbr-${{ github.run_number }}
           path: output/
           compression-level: 0
           if-no-files-found: error

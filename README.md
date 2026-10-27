@@ -36,7 +36,7 @@
 
 ## 插件与菜单
 
-成品基线共 662 个软件包、39 个 LuCI 应用；配置中 690 个包相关符号还包含构建/变体选项，不等于成品包数。完整清单见 [manifest](docs/baseline-r4/firmware.manifest)。
+成品基线共 666 个软件包、40 个 LuCI 应用；配置中 694 个包相关符号还包含构建/变体选项，不等于成品包数。完整清单见 [manifest](docs/baseline-r4/firmware.manifest)。
 
 | 分类 | 主要应用 |
 | --- | --- |
@@ -46,7 +46,7 @@
 | VPN | OpenVPN、Tailscale、ZeroTier、FRP 客户端、FRP 服务端、EasyTier；同时保留 WireGuard 协议支持 |
 | NAS | 磁盘管理、文件管理、Samba4、SMB/CIFS 远程挂载、OpenList、Aria2、MiniDLNA |
 | Docker | 独立一级菜单 |
-| 网络 | 接口、路由、防火墙、SQM、多 WAN、wrtbwmon、标准 Bandix（状态/连接/DNS/设置） |
+| 网络 | 接口、路由、防火墙、SQM、多 WAN、wrtbwmon、标准 Bandix（状态/连接/DNS/设置）、网络加速（BBR） |
 | 首页/商店 | QuickStart、iStore |
 
 菜单迁移保留旧链接的隐藏别名，以兼容原插件内部跳转。原有 PassWall2、AdBlock Fast、Transmission、nlbwmon、acme、https-dns-proxy、irqbalance、banIP 及 Bandix Plus 不在成品中。Open-Box 继续采用官方后安装方案，不打包。
@@ -73,7 +73,7 @@ bash scripts/build.sh /path/to/new-work
 
 ## 验证与已知限制
 
-云端本次构建会检查：四种镜像分区和 SHA256、成品 manifest、39 个应用、移除项、eBPF 内核标志、实际 rootfs 中的 AdGuard Home LMO 和脚本。只有校验通过才生成固件下载包。
+云端本次构建会检查：四种镜像分区和 SHA256、成品 manifest、40 个应用、移除项、eBPF 内核标志、实际 rootfs 中的 AdGuard Home LMO 和脚本。只有校验通过才生成固件下载包。
 
 历史本地 r4 已通过 BIOS/UEFI VirtIO 隔离启动、br-lan/LAN、LuCI 页面和实际返回的 35 条中文译文验证，见 [测试报告](docs/baseline-r4/test-report.zh-CN.md)。**每次云构建不会继承这份历史报告作为运行验收结果**，输出 JSON 明确记录本次未运行的启动/HTTP 测试。
 
@@ -94,3 +94,9 @@ bash scripts/build.sh /path/to/new-work
 - `docs/baseline-r4/`：已完成的本地基线报告、manifest 和校验和。
 
 上游项目与致谢见 [ACKNOWLEDGEMENTS.md](ACKNOWLEDGEMENTS.md)。各软件包和补丁保留其上游许可证；本仓库不改变第三方软件授权，也不声称所有插件二进制均由完整源码重编。标准 Bandix 后端使用上游发布资产，打包定义及散列均锁定。
+
+## BBR 网络加速扩展
+
+新增本仓库维护的轻量 `luci-app-bbr` 中文页面，入口为 **网络 → 网络加速（BBR）**，默认开启原生 BBR + FQ。关闭开关切回 CUBIC。使用锁定源码的 `kmod-tcp-bbr`、`kmod-sched`，保留 firewall4/nftables，流量卸载仍关闭。
+
+BBR 影响路由器本机建立的 TCP（含代理、下载）；普通 LAN 转发流量不保证提速。保存应用仅影响新连接；默认队列变化需要新建接口或重启，已有 SQM 配置保持优先。页面显示实际生效算法、可用算法及默认队列。云端检查新增模块、页面和启动服务，未进行本次实际运行及吞吐测试。历史 r4 manifest 仍保留原样，新增构建以其自身 manifest 为准。

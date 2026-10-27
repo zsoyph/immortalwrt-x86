@@ -1,0 +1,18 @@
+{
+  "admin/network/bbr": {
+    "title": "网络加速（BBR）",
+    "order": 95,
+    "action": {
+      "type": "view",
+      "path": "network/bbr"
+    },
+    "depends": {
+      "acl": [
+        "luci-app-bbr"
+      ],
+      "uci": {
+        "bbr": true
+      }
+    }
+  }
+}

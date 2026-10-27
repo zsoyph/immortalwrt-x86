@@ -1,0 +1,27 @@
+#!/bin/sh /etc/rc.common
+START=99
+USE_PROCD=1
+
+start_service() {
+	local enabled
+	config_load bbr
+	config_get_bool enabled main enabled 1
+	local algorithm=cubic
+	if [ "$enabled" = 1 ]; then
+		modprobe tcp_bbr || return 1
+		algorithm=bbr
+	fi
+	modprobe sch_fq || return 1
+	# This file also makes the setting persistent across sysctl reloads.
+	mkdir -p /etc/sysctl.d
+	printf 'net.ipv4.tcp_congestion_control=%s\nnet.core.default_qdisc=fq\n' "$algorithm" > /etc/sysctl.d/99-bbr.conf
+	sysctl -p /etc/sysctl.d/99-bbr.conf
+}
+
+reload_service() {
+	start_service
+}
+
+service_triggers() {
+	procd_add_reload_trigger bbr
+}

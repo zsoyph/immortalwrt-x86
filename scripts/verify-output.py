@@ -43,14 +43,14 @@ def main():
     subprocess.run(['sha256sum', '-c', 'sha256sums'], cwd=target, check=True)
     names = {line.split(' - ')[0] for line in next(target.glob('*.manifest')).read_text(encoding='utf-8').splitlines()}
     required_apps = {line.split(' - ')[0] for line in (PROJECT / 'docs/baseline-r4/firmware.manifest').read_text(encoding='utf-8').splitlines() if line.startswith('luci-app-')}
-    required_apps |= {'luci-app-partexp', 'luci-app-poweroffdevice', 'luci-app-easytier'}
+    required_apps |= {'luci-app-bbr', 'luci-app-partexp', 'luci-app-poweroffdevice', 'luci-app-easytier'}
     assert required_apps <= names, sorted(required_apps - names)
-    assert {'bandix', 'dae', 'daed', 'firewall4', 'nftables-json', 'iptables-nft', 'ip6tables-nft', 'kmod-fs-cifs', 'vlmcsd', 'luci-i18n-adguardhome-zh-cn'} <= names
+    assert {'kmod-tcp-bbr', 'kmod-sched', 'kmod-lib-textsearch', 'bandix', 'dae', 'daed', 'firewall4', 'nftables-json', 'iptables-nft', 'ip6tables-nft', 'kmod-fs-cifs', 'vlmcsd', 'luci-i18n-adguardhome-zh-cn'} <= names
     removed = {'luci-app-acme', 'luci-app-https-dns-proxy', 'luci-app-irqbalance', 'luci-app-banip', 'luci-app-passwall2', 'luci-app-transmission', 'luci-app-nlbwmon', 'luci-app-adblock-fast'}
     assert not names & removed
     assert not any('bandix-plus' in name or ('tables' in name and 'legacy' in name) for name in names)
-    assert len(required_apps) == 39
-    assert len(names) == 662, f'Unexpected manifest package count: {len(names)}'
+    assert len(required_apps) == 40
+    assert len(names) == 666, f'Unexpected manifest package count: {len(names)}'
     images = []
     for filesystem in ['ext4', 'squashfs']:
         for boot in ['combined', 'combined-efi']:
@@ -61,9 +61,12 @@ def main():
             images.append({'name': image.name, 'bytes': image.stat().st_size, 'partition_bytes': sizes})
     kernel = next((core / 'build_dir/target-x86_64_musl/linux-x86_64').glob('linux-6.12.*/.config'))
     text = kernel.read_text(encoding='utf-8')
-    flags = ['BPF', 'BPF_SYSCALL', 'BPF_JIT', 'DEBUG_INFO_BTF', 'CGROUP_BPF', 'NET_CLS_BPF', 'NET_ACT_BPF']
+    flags = ['BPF', 'BPF_SYSCALL', 'BPF_JIT', 'DEBUG_INFO_BTF', 'CGROUP_BPF', 'NET_CLS_BPF', 'NET_ACT_BPF', 'TCP_CONG_BBR', 'NET_SCH_FQ']
     assert all(re.search(r'^CONFIG_' + flag + r'=[ym]$', text, re.M) for flag in flags)
     root = core / 'build_dir/target-x86_64_musl/root-x86'
+    for relative in ['etc/config/bbr', 'etc/init.d/bbr', 'usr/share/luci/menu.d/luci-app-bbr.json', 'usr/share/rpcd/acl.d/luci-app-bbr.json', 'www/luci-static/resources/view/network/bbr.js']:
+        assert (root / relative).is_file(), relative
+    assert list((root / 'etc/rc.d').glob('S99bbr')), 'BBR boot service must be enabled'
     lmo = root / 'usr/lib/lua/luci/i18n/adguardhome.zh-cn.lmo'
     assert lmo.is_file() and lmo.stat().st_size > 0
     view = root / 'www/luci-static/resources/view/adguardhome/config.js'
