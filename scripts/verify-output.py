@@ -52,7 +52,12 @@ def main():
     assert not names & removed
     assert not any('bandix-plus' in name or ('tables' in name and 'legacy' in name) for name in names)
     assert len(required_apps) == 40
-    assert len(names) == 667, f'Unexpected manifest package count: {len(names)}'
+    baseline_names = {line.split(' - ')[0] for line in (PROJECT / 'docs/baseline-r6/firmware.manifest').read_text().splitlines()}
+    assert baseline_names <= names, sorted(baseline_names - names)
+    versions = dict(line.split(' - ', 1) for line in next(target.glob('*.manifest')).read_text().splitlines())
+    updates = json.loads((PROJECT / 'updates.lock.json').read_text())
+    for package, expected in {**updates['frozen_versions'], **updates['expected_versions']}.items():
+        assert versions.get(package) == expected, (package, versions.get(package), expected)
     images = []
     for filesystem in ['ext4', 'squashfs']:
         for boot in ['combined', 'combined-efi']:
@@ -82,6 +87,9 @@ def main():
     assert "option fullcone_nat '1'" in config and "option bbr_cca '1'" in config
     init = (root / 'etc/init.d/turboacc').read_text(encoding='utf-8')
     assert 'firewall.@defaults[0].fullcone6' in init
+    assert list((root / 'etc/rc.d').glob('S*passwall')), 'PassWall lifecycle entry must stay enabled'
+    profile = (root / 'etc/uci-defaults/99-custom-build-profile').read_text()
+    assert '/etc/init.d/passwall enable' in profile
     lmo = root / 'usr/lib/lua/luci/i18n/adguardhome.zh-cn.lmo'
     assert lmo.is_file() and lmo.stat().st_size > 0
     view = root / 'www/luci-static/resources/view/adguardhome/config.js'
@@ -96,7 +104,7 @@ def main():
     shutil.copy2(PROJECT / 'sources.lock.json', output / 'sources.lock.json')
     shutil.copy2(lmo, output / lmo.name)
     report = {'checked': datetime.datetime.now(datetime.timezone.utc).isoformat(),
-              'baseline': '20261023-r4', 'profile': '20261027-r6-turboacc', 'packages': len(names), 'luci_apps': len(required_apps),
+              'baseline': '20261023-r4', 'profile': '20261029-r7', 'packages': len(names), 'luci_apps': len(required_apps),
               'images': images, 'kernel_flags_verified': flags, 'adguardhome_lmo_in_rootfs': True,
               'runtime_boot_tested_this_build': False, 'runtime_translation_http_tested_this_build': False}
     (output / 'build-verification.json').write_text(json.dumps(report, indent=2))

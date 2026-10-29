@@ -1,0 +1,32 @@
+[
+  [
+    "bandix-0.12.12-x86_64-unknown-linux-musl.tar.gz",
+    "https://github.com/timsaya/bandix/releases/download/v0.12.12/bandix-0.12.12-x86_64-unknown-linux-musl.tar.gz",
+    "a951a64b835fc0eb9c53b3166154fbc067b85f9e6a4a5d6ebdd4282ef7b492dd"
+  ],
+  [
+    "adguardhome-frontend-0.107.79.tar.gz",
+    "https://github.com/AdguardTeam/AdGuardHome/releases/download/v0.107.79/adguardhome-frontend-0.107.79.tar.gz",
+    "30184c157d4aefe5371b575a43c0ab5a7314aef039a820cc421ea67bab994ce8"
+  ],
+  [
+    "openlist-frontend-dist-v4.2.9.tar.gz",
+    "https://github.com/OpenListTeam/OpenList-Frontend/releases/download/v4.2.9/openlist-frontend-dist-v4.2.9.tar.gz",
+    "b147ff4e6c6eee5dda5785a6c3028d9896ee7522a2c66c404dd7ba97fb4e78ed"
+  ],
+  [
+    "openvpn-2.7.8.tar.gz",
+    "https://github.com/OpenVPN/openvpn/releases/download/v2.7.8/openvpn-2.7.8.tar.gz",
+    "c070d1d2440b5a6fca6c2c68645c98cd492116ac36ef4f0946177115532c8e36"
+  ],
+  [
+    "dae-src-2026.10.18-9ec2736d61b0.tar.gz",
+    "https://github.com/kenzok8/openwrt-daede/releases/download/dae-src/dae-src-2026.10.18-9ec2736d61b0.tar.gz",
+    "9ec2736d61b0d697e61d05472a3225709a6db836bce1b3075482f9d209cd5beb"
+  ],
+  [
+    "daed-src-2026.10.18-ac22e7a32e17.tar.gz",
+    "https://github.com/kenzok8/openwrt-daede/releases/download/daed-src/daed-src-2026.10.18-ac22e7a32e17.tar.gz",
+    "ac22e7a32e176a4a88292cce3c22badc4b62f6956e99bb98245fc92e1a10e159"
+  ]
+]

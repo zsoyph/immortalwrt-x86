@@ -1,3 +1,7 @@
+# 当前构建：r7 定向升级与 PassWall 启动修复
+
+本轮升级说明见 [r7-upgrades](docs/r7-upgrades.md)，精确版本见 [updates.lock.json](updates.lock.json)。Netdata 和 EasyTier 保持原版本。以下为沿用的项目与历史验证说明。
+
 # ImmortalWrt x86/64 r6 TurboACC 云编译
 
 [![Build](https://github.com/zsoyph/immortalwrt-x86/actions/workflows/build-immortalwrt.yml/badge.svg)](https://github.com/zsoyph/immortalwrt-x86/actions/workflows/build-immortalwrt.yml)

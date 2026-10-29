@@ -21,7 +21,7 @@
     },
     "daede": {
       "url": "https://github.com/kenzok8/openwrt-daede.git",
-      "commit": "b2ee711a345d171d78af3d510378b689bdfb9830"
+      "commit": "183b5a22b0b91e19e34a8780d90646b704e50ed1"
     },
     "istore": {
       "url": "https://github.com/istoreos/istore.git",
@@ -41,11 +41,11 @@
     },
     "bandix-luci": {
       "url": "https://github.com/timsaya/luci-app-bandix.git",
-      "commit": "159a6de184b8cbd0694b40f018e737d0a3c82e7e"
+      "commit": "108369b8da05f01296a3ed0210a2ab60809712e5"
     },
     "bandix-backend": {
       "url": "https://github.com/timsaya/openwrt-bandix.git",
-      "commit": "c95b03d40b30c31e89c090aaf134750f05bf3f19"
+      "commit": "0760d1f5b52d1a2317dfd171ab00fe6543a9a0c4"
     },
     "nikki": {
       "url": "https://github.com/nikkinikki-org/OpenWrt-nikki.git",
@@ -72,6 +72,19 @@
     "turboacc": {
       "url": "https://github.com/chenmozhijin/turboacc.git",
       "commit": "530092c532839efb96e9f328d34dbf3adff4b557"
+    },
+    "luci-updates": {
+      "url": "https://github.com/immortalwrt/luci.git",
+      "commit": "c84adb975e207ae8b14982191838ec6218d632cd"
+    },
+    "packages-updates": {
+      "url": "https://github.com/immortalwrt/packages.git",
+      "commit": "006a19cba079cd045fe6b4e8f19508347d0dcb9e"
+    },
+    "packages-stable": {
+      "url": "https://github.com/immortalwrt/packages.git",
+      "commit": "6f8f6461e8a6a0bbc134592d12353700fe698506"
     }
-  }
+  },
+  "profile": "20261029-r7"
 }

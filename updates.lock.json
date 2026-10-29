@@ -1,0 +1,123 @@
+{
+  "profile": "20261029-r7",
+  "directories": [
+    {
+      "source": "packages-stable",
+      "target": "packages",
+      "path": "net/adguardhome"
+    },
+    {
+      "source": "packages-stable",
+      "target": "packages",
+      "path": "net/ddns-scripts"
+    },
+    {
+      "source": "packages-updates",
+      "target": "packages",
+      "path": "net/ddns-go"
+    },
+    {
+      "source": "packages-updates",
+      "target": "packages",
+      "path": "net/frp"
+    },
+    {
+      "source": "packages-updates",
+      "target": "packages",
+      "path": "net/xray-core"
+    },
+    {
+      "source": "packages-updates",
+      "target": "packages",
+      "path": "net/openlist"
+    },
+    {
+      "source": "packages-updates",
+      "target": "packages",
+      "path": "net/tailscale"
+    },
+    {
+      "source": "packages-updates",
+      "target": "packages",
+      "path": "net/zerotier"
+    },
+    {
+      "source": "packages-updates",
+      "target": "packages",
+      "path": "net/openvpn"
+    },
+    {
+      "source": "packages-updates",
+      "target": "packages",
+      "path": "net/miniupnpd"
+    },
+    {
+      "source": "packages-updates",
+      "target": "packages",
+      "path": "net/sqm-scripts"
+    },
+    {
+      "source": "luci-updates",
+      "target": "luci",
+      "path": "applications/luci-app-passwall"
+    },
+    {
+      "source": "luci-updates",
+      "target": "luci",
+      "path": "applications/luci-app-openclash"
+    },
+    {
+      "source": "packages-updates",
+      "target": "packages",
+      "path": "lang/golang/golang1.27"
+    }
+  ],
+  "expected_versions": {
+    "bandix": "0.12.12-r1",
+    "luci-app-bandix": "0.12.12-r5",
+    "adguardhome": "0.107.79-r1",
+    "dae": "2026.10.18-r1",
+    "daed": "2026.10.18-r2",
+    "luci-app-daede": "1.15-r13",
+    "ddns-go": "6.17.7-r1",
+    "ddns-scripts": "2.8.4-r8",
+    "ddns-scripts-services": "2.8.4-r8",
+    "frpc": "0.71.1-r1",
+    "frps": "0.71.1-r1",
+    "luci-app-openclash": "0.48.002",
+    "luci-app-passwall": "26.10.22-r1",
+    "mihomo-meta": "1.19.33",
+    "xray-core": "26.10.21-r1",
+    "openlist": "4.2.9-r1",
+    "tailscale": "1.104.4-r2",
+    "zerotier": "1.16.2-r1",
+    "openvpn-openssl": "2.7.8-r2",
+    "miniupnpd-nftables": "2.3.11-r1",
+    "sqm-scripts": "1.8.0-r1"
+  },
+  "frozen_versions": {
+    "netdata": "1.38.1-r3",
+    "easytier-noweb": "2.7.0",
+    "sing-box": "1.12.25-r1",
+    "dockerd": "29.6.1-r1",
+    "docker": "29.6.1-r1",
+    "samba4-server": "4.22.7-r3",
+    "shadowsocks-rust-sslocal": "1.24.0-r1",
+    "luci-app-nikki": "1.26.2-r1"
+  },
+  "boot_fix": "Enable PassWall rc entry; keep upstream global proxy disabled; retain runtime settings on upgrade.",
+  "overlay_sha256": {
+    "overlays/packages/net/ddns-go/Makefile": "c903f76c1ba61a32e245f783102e1d7bd20239a5a7700ca35da454138cad064f",
+    "overlays/packages/net/frp/Makefile": "7ddbf0e1f7be93a971745c9e2e313f1c8cc5a768ef50b05c2c9238a569ac2d32",
+    "overlays/packages/net/openlist/Makefile": "17e4b6a88ebb819d9aef8a3142ceb47c394db9e2bdaf91b14a09e1d2138370ab",
+    "overlays/packages/net/openvpn/Makefile": "d63e11a4d1861d88605099af93e6b2b65e36beda8de2f3db6685c4777f0108ea",
+    "overlays/packages/net/tailscale/Makefile": "b5969b60fcabe9c0acb80c7977140b93c7182e096bc6f1f856124db7ef9f35c9",
+    "overlays/nikki/mihomo-meta/Makefile": "4b0df42887c0d908f6fa9c0d4194eb667469170b8e8022387efc4657fae77192"
+  },
+  "host_toolchains": {
+    "default": "unchanged Go 1.26",
+    "openlist": "Go 1.27.3",
+    "tailscale": "Go 1.27.3",
+    "source": "packages-updates/lang/golang/golang1.27"
+  }
+}

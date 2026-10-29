@@ -41,6 +41,21 @@ def main():
         run(['git', '-c', 'advice.detachedHead=false', 'checkout', '--detach', 'FETCH_HEAD'], path)
         actual = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=path, text=True).strip()
         assert actual == source['commit'], name
+    updates = json.loads((PROJECT / 'updates.lock.json').read_text(encoding='utf-8'))
+    for update in updates['directories']:
+        target = paths[update['target']] / update['path']
+        if target.exists():
+            shutil.rmtree(target)
+        shutil.copytree(paths[update['source']] / update['path'], target, symlinks=True)
+    # Local recipe adaptations are applied over the selected immutable sources.
+    for feed in ['packages', 'luci', 'nikki']:
+        overlay = PROJECT / 'overlays' / feed
+        if overlay.exists():
+            for source in overlay.rglob('*'):
+                if source.is_file():
+                    target = paths[feed] / source.relative_to(overlay)
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(source, target)
     for patch in sorted((PROJECT / 'patches').glob('*.patch')):
         target = paths[patch.stem]
         run(['git', 'apply', '--check', str(patch)], target)

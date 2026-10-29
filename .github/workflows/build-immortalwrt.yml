@@ -1,4 +1,4 @@
-name: Build ImmortalWrt x86 r6 TurboACC
+name: Build ImmortalWrt x86 r7 targeted upgrades + PassWall startup fix
 
 on:
   workflow_dispatch:
@@ -13,6 +13,8 @@ on:
       - 'translations/**'
       - 'scripts/**'
       - 'sources.lock.json'
+      - 'updates.lock.json'
+      - 'overlays/**'
 
 permissions:
   contents: read
@@ -23,7 +25,7 @@ concurrency:
 
 jobs:
   build:
-    name: r6 TurboACC + partexp + poweroff / x86-64 / BIOS + UEFI
+    name: r7 targeted upgrades + PassWall startup fix + partexp + poweroff / x86-64 / BIOS + UEFI
     runs-on: ubuntu-24.04
     timeout-minutes: 360
     env:
@@ -81,7 +83,7 @@ jobs:
       - name: Upload verified firmware, manifest and checksums
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
-          name: immortalwrt-25.12.2-x86-64-r6-turboacc-${{ github.run_number }}
+          name: immortalwrt-25.12.2-x86-64-r7-upgrades-${{ github.run_number }}
           path: output/
           compression-level: 0
           if-no-files-found: error
@@ -91,7 +93,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
-          name: build-logs-r6-turboacc-${{ github.run_number }}
+          name: build-logs-r7-upgrades-${{ github.run_number }}
           path: |
             logs/
             work/preparation.json
@@ -105,7 +107,7 @@ jobs:
         if: always()
         run: |
           {
-            echo '## ImmortalWrt x86 r6 TurboACC'
+            echo '## ImmortalWrt x86 r7 targeted upgrades + PassWall startup fix'
             echo 'Baseline: 25.12.2 / Linux 6.12.103 / standard Bandix / AdGuard Home LuCI 简体中文 / TurboACC fw4 fullcone'
             echo 'Firmware is available only when compile and artifact verification succeeded.'
             echo 'Cloud checks verify images, manifest, selected apps, eBPF flags and LMO packaging.'

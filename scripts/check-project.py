@@ -29,7 +29,7 @@ assert 'CONFIG_TARGET_ROOTFS_PARTSIZE=4096' in config
 po = (root / 'translations/adguardhome.zh_Hans.po').read_text(encoding='utf-8')
 assert len(re.findall(r'^msgid ".+"$', po, re.M)) == 36
 assert '未知版本' in po
-for directory in ['packages', 'configs', 'files', 'patches', 'scripts', 'translations', 'docs', '.github']:
+for directory in ['packages', 'configs', 'files', 'patches', 'scripts', 'translations', 'docs', '.github', 'overlays']:
     for file in (root / directory).rglob('*'):
         if not file.is_file() or '__pycache__' in file.parts:
             continue
@@ -38,3 +38,10 @@ for directory in ['packages', 'configs', 'files', 'patches', 'scripts', 'transla
 print(json.dumps({'source_repositories': len(lock['repositories']), 'config_selected_symbols': len(selected),
                   'luci_apps': 40, 'translation_entries': 36,
                   'config_sha256': hashlib.sha256(config.encode()).hexdigest(), 'checks': 'passed'}))
+
+updates = json.loads((root / "updates.lock.json").read_text(encoding="utf-8"))
+for relative, digest in updates["overlay_sha256"].items():
+    assert hashlib.sha256((root / relative).read_bytes()).hexdigest() == digest, relative
+profile = (root / "files/etc/uci-defaults/99-custom-build-profile").read_text(encoding="utf-8")
+assert "openclash passwall dae" not in profile
+assert "/etc/init.d/passwall enable" in profile
