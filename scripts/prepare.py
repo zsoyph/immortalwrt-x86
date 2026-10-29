@@ -92,6 +92,8 @@ def main():
             upstream = paths['turboacc'] / ('LICENSE' if str(relative) == 'LICENSE' else 'luci-app-turboacc/' + relative.as_posix())
             assert file.read_bytes() == upstream.read_bytes(), str(relative)
     shutil.copytree(PROJECT / 'packages/luci-app-turboacc', custom / 'luci-app-turboacc')
+    for name in ['honk', 'luci-app-honk', 'luci-lib-daeuniverse']:
+        shutil.copytree(PROJECT / 'packages' / name, custom / name)
     for name, source in links.items():
         assert (source / 'Makefile').is_file() or name in ['nikki', 'daede', 'istore', 'wrtbwmon-luci'], source
         (custom / name).symlink_to(source, target_is_directory=True)
@@ -114,7 +116,7 @@ def main():
     resolved = (core / '.config').read_text(encoding='utf-8')
     missing, extra = selected(seed) - selected(resolved), selected(resolved) - selected(seed)
     assert not missing and not extra, {'packages_missing': sorted(missing), 'packages_extra': sorted(extra)}
-    assert len([name for name in selected(resolved) if name.startswith('luci-app-') and '_' not in name]) == 40
+    assert len([name for name in selected(resolved) if name.startswith('luci-app-') and '_' not in name]) == 41
     assert 'CONFIG_TARGET_ROOTFS_PARTSIZE=4096' in resolved
     assert 'CONFIG_TARGET_KERNEL_PARTSIZE=128' in resolved
     (work / 'preparation.json').write_text(json.dumps({

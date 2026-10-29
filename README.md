@@ -1,8 +1,16 @@
-# 当前构建：r7 定向升级与 PassWall 启动修复
+# 当前构建：r8 Honk 云编译
 
-本轮升级说明见 [r7-upgrades](docs/r7-upgrades.md)，精确版本见 [updates.lock.json](updates.lock.json)。Netdata 和 EasyTier 保持原版本。以下为沿用的项目与历史验证说明。
+Honk **v0.1.0-beta.3（预发布版）**，保留 r7 完整应用及锁定版本、PassWall 启动入口修复，Netdata/EasyTier不升级。系统25.12.2/Linux6.12.103，41应用/702选包，128/4096MiB分区。
 
-# ImmortalWrt x86/64 r6 TurboACC 云编译
+采用官方已编译 x86_64 静态 musl full 包（真实eBPF+嵌入式Doona）打包进固件，不宣称本项目从Rust重编核心。菜单【服务/Honk】，默认关闭；系统入口enable以保留配置触发链路。启动拒绝与DAE/DAED并行，不修改其UCI。Doona仅回环127.0.0.1:9527，SSH转发访问；Clash API回环19090。
+
+官方来源和SHA256见 [honk.lock.json](honk.lock.json)，[适配说明](docs/r8-honk.md)。核心GPL及Doona第三方声明随固件保留。DAED使用Go1.27.3修复旧配方编译器版本不足。
+
+云端产物 immortalwrt-25.12.2-x86-64-r8-honk-运行编号 保留14天，诊断7天。只在全部成品检查成功后上传固件。云端未做本轮隔离启动和Honk实际流量测试，历史本地测试不能代替。
+
+---
+
+# ImmortalWrt x86/64 r8 Honk 云编译
 
 [![Build](https://github.com/zsoyph/immortalwrt-x86/actions/workflows/build-immortalwrt.yml/badge.svg)](https://github.com/zsoyph/immortalwrt-x86/actions/workflows/build-immortalwrt.yml)
 
@@ -10,7 +18,7 @@ ImmortalWrt **25.12.2 / Linux 6.12.103**，x86/64。r6 用 **TurboACC 1.4** 替�
 
 ## 云编译与下载
 
-打开 [Actions](https://github.com/zsoyph/immortalwrt-x86/actions/workflows/build-immortalwrt.yml)，选择 **Run workflow**。main 的构建配置或源码变化也会触发。成功后在本次运行的 Artifacts 下载 `immortalwrt-25.12.2-x86-64-r6-turboacc-运行编号`，保留 **14 天**；诊断日志保留 7 天。不自动发布 Release、不刷机，不需要个人令牌或局域网编译机凭据。云端使用 GitHub 托管 Ubuntu 24.04，工作流只申请 contents:read。
+打开 [Actions](https://github.com/zsoyph/immortalwrt-x86/actions/workflows/build-immortalwrt.yml)，选择 **Run workflow**。main 的构建配置或源码变化也会触发。成功后在本次运行的 Artifacts 下载 `immortalwrt-25.12.2-x86-64-r8-honk-运行编号`，保留 **14 天**；诊断日志保留 7 天。不自动发布 Release、不刷机，不需要个人令牌或局域网编译机凭据。云端使用 GitHub 托管 Ubuntu 24.04，工作流只申请 contents:read。
 
 ## 本版配置
 
@@ -22,7 +30,7 @@ ImmortalWrt **25.12.2 / Linux 6.12.103**，x86/64。r6 用 **TurboACC 1.4** 替�
 | 防火墙 | 原生 firewall4/nftables；保留 iptables-nft 兼容层，禁用 legacy |
 | 网络加速 | 网络 → Turbo ACC 网络加速；默认开启 BBR + FQ、IPv4 全锥形 NAT |
 | 流量卸载 | 软件、硬件、SFE 默认关闭，IPv6 全锥形默认关闭；不编译 SFE |
-| 应用 | 40 个 LuCI 应用，预期 667 个成品软件包；695 个包相关配置符号含构建选项 |
+| 应用 | 41 个 LuCI 应用；702 个包相关配置符号含构建选项，成品包核对完整基线且新增 Honk 依赖 |
 
 TurboACC 基于 chenmozhijin 的 firewall4 分支，固定上游提交，保留 GPL-3.0 许可证。没有运行替换 firewall4/nftables 的上游安装器。适配说明与完整差异见 [配置说明](docs/turboacc-profile.md) 和 [适配补丁](docs/turboacc-immortalwrt-adaptation.diff)。准备脚本会将该差异应用到锁定上游并逐文件核对打包源码。BBR 作用于本机建立的 TCP 连接，普通 LAN 转发不保证提速。流量卸载保持关闭以保留 Bandix、dae 的统计与转发路径。
 
@@ -32,7 +40,7 @@ TurboACC 基于 chenmozhijin 的 firewall4 分支，固定上游提交，保留 
 | --- | --- |
 | 状态 | 默认状态项，Netdata 最后 |
 | 系统 | 软件包、Argon 配置、终端、计划重启、关机、分区扩容 |
-| 服务 | AdGuard Home、SmartDNS、DDNS、DDNS-Go、HomeProxy、OpenClash、PassWall、Nikki、DAE/DAED、vlmcsd、UPnP |
+| 服务 | AdGuard Home、SmartDNS、DDNS、DDNS-Go、HomeProxy、OpenClash、PassWall、Nikki、DAE/DAED、Honk、vlmcsd、UPnP |
 | VPN | OpenVPN、Tailscale、ZeroTier、FRP 客户端/服务端、EasyTier；WireGuard 协议支持 |
 | NAS | 磁盘/文件管理、Samba4、远程 CIFS 挂载、OpenList、Aria2、MiniDLNA |
 | Docker | 独立一级菜单 |

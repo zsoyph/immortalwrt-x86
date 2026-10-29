@@ -93,7 +93,10 @@
     "zerotier": "1.16.2-r1",
     "openvpn-openssl": "2.7.8-r2",
     "miniupnpd-nftables": "2.3.11-r1",
-    "sqm-scripts": "1.8.0-r1"
+    "sqm-scripts": "1.8.0-r1",
+    "honk": "0.1.0_beta3-r1",
+    "luci-app-honk": "2026.10.29-r1",
+    "luci-lib-daeuniverse": "2026.10.29-r1"
   },
   "frozen_versions": {
     "netdata": "1.38.1-r3",
@@ -120,6 +123,7 @@
     "openlist": "Go 1.27.3",
     "tailscale": "Go 1.27.3",
     "source": "packages-updates/lang/golang/golang1.27",
-    "xray-core": "Go 1.27.3"
+    "xray-core": "Go 1.27.3",
+    "daed": "Go 1.27.3 (upstream go.mod requires >=1.26.10; baseline host is 1.26.8)"
   }
 }

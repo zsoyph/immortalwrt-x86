@@ -24,3 +24,5 @@
 此外感谢内核、netfilter/nftables、Docker、Samba、OpenList、FRP、Tailscale、ZeroTier、WireGuard、OpenVPN、Nikki、OpenClash、PassWall、Argon 等所有被集成组件的上游作者。软件包的具体许可证以各包源码和安装文件为准。
 
 本项目的配置、菜单调整和中文翻译没有改变上游软件的许可证。再分发固件时，应按各组件的许可证保留版权信息，并提供相应源码、补丁和构建信息。
+
+- [honk](https://github.com/daeuniverse/honk) 与 [官方 OpenWrt 集成](https://github.com/daeuniverse/openwrt-packages)：GPL-3.0；Doona 原许可与第三方声明随固件保留。

@@ -43,7 +43,7 @@ def main():
     subprocess.run(['sha256sum', '-c', 'sha256sums'], cwd=target, check=True)
     names = {line.split(' - ')[0] for line in next(target.glob('*.manifest')).read_text(encoding='utf-8').splitlines()}
     required_apps = {line.split(' - ')[0] for line in (PROJECT / 'docs/baseline-r4/firmware.manifest').read_text(encoding='utf-8').splitlines() if line.startswith('luci-app-')}
-    required_apps |= {'luci-app-turboacc', 'luci-app-partexp', 'luci-app-poweroffdevice', 'luci-app-easytier'}
+    required_apps |= {'luci-app-honk', 'luci-app-turboacc', 'luci-app-partexp', 'luci-app-poweroffdevice', 'luci-app-easytier'}
     assert required_apps <= names, sorted(required_apps - names)
     assert {'kmod-tcp-bbr', 'kmod-sched', 'kmod-lib-textsearch', 'bandix', 'dae', 'daed', 'firewall4', 'nftables-json', 'iptables-nft', 'ip6tables-nft', 'kmod-fs-cifs', 'vlmcsd', 'luci-i18n-adguardhome-zh-cn'} <= names
     assert {'luci-i18n-partexp-zh-cn', 'luci-i18n-poweroffdevice-zh-cn'} <= names
@@ -51,7 +51,7 @@ def main():
     removed = {'luci-app-bbr', 'luci-app-acme', 'luci-app-https-dns-proxy', 'luci-app-irqbalance', 'luci-app-banip', 'luci-app-passwall2', 'luci-app-transmission', 'luci-app-nlbwmon', 'luci-app-adblock-fast'}
     assert not names & removed
     assert not any('bandix-plus' in name or ('tables' in name and 'legacy' in name) for name in names)
-    assert len(required_apps) == 40
+    assert len(required_apps) == 41
     baseline_names = {line.split(' - ')[0] for line in (PROJECT / 'docs/baseline-r6/firmware.manifest').read_text().splitlines()}
     assert baseline_names <= names, sorted(baseline_names - names)
     versions = dict(line.split(' - ', 1) for line in next(target.glob('*.manifest')).read_text().splitlines())
@@ -68,7 +68,7 @@ def main():
             images.append({'name': image.name, 'bytes': image.stat().st_size, 'partition_bytes': sizes})
     kernel = next((core / 'build_dir/target-x86_64_musl/linux-x86_64').glob('linux-6.12.*/.config'))
     text = kernel.read_text(encoding='utf-8')
-    flags = ['BPF', 'BPF_SYSCALL', 'BPF_JIT', 'DEBUG_INFO_BTF', 'CGROUP_BPF', 'NET_CLS_BPF', 'NET_ACT_BPF', 'TCP_CONG_BBR', 'NET_SCH_FQ']
+    flags = ['BPF', 'BPF_SYSCALL', 'BPF_JIT', 'DEBUG_INFO_BTF', 'CGROUP_BPF', 'NET_CLS_BPF', 'NET_ACT_BPF', 'TCP_CONG_BBR', 'NET_SCH_FQ', 'NET_SCHED', 'NET_CLS_ACT', 'NET_XGRESS', 'NET_NS', 'NF_TABLES_INET', 'NFT_CT', 'NFT_QUEUE', 'NETFILTER_NETLINK_QUEUE']
     assert all(re.search(r'^CONFIG_' + flag + r'=[ym]$', text, re.M) for flag in flags)
     root = core / 'build_dir/target-x86_64_musl/root-x86'
     for app in ['partexp', 'poweroffdevice']:
@@ -94,6 +94,18 @@ def main():
     assert lmo.is_file() and lmo.stat().st_size > 0
     view = root / 'www/luci-static/resources/view/adguardhome/config.js'
     assert "_('Unknown version')" in view.read_text(encoding='utf-8')
+    assert {'honk','luci-app-honk','luci-lib-daeuniverse','kmod-nft-queue','kmod-nfnetlink-queue'} <= names
+    honk_config = (root / 'etc/config/honk').read_text()
+    assert "option enabled '0'" in honk_config
+    for rel in ['usr/bin/honk-core','usr/share/licenses/honk/LICENSE','usr/share/licenses/honk/doona/THIRD-PARTY-NOTICES.txt','www/luci-static/resources/view/honk/main.js','www/luci-static/resources/daeuniverse/service.js']:
+        assert (root / rel).is_file(), rel
+    binary = root / 'usr/bin/honk-core'
+    version = subprocess.check_output([str(binary), '--version'], text=True).strip()
+    assert '0.1.0-beta.3' in version, version
+    assert 'INTERP' not in subprocess.check_output(['readelf','-l',str(binary)],text=True)
+    assert list((root / 'etc/rc.d').glob('S*honk'))
+    menu = json.loads((root / 'usr/share/luci/menu.d/luci-app-honk.json').read_text())
+    assert 'admin/services/honk' in menu
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
     for file in target.iterdir():
@@ -102,9 +114,10 @@ def main():
     shutil.copy2(core / '.config', output / 'firmware.config')
     shutil.copy2(kernel, output / 'kernel.config')
     shutil.copy2(PROJECT / 'sources.lock.json', output / 'sources.lock.json')
+    shutil.copy2(PROJECT / 'honk.lock.json', output / 'honk.lock.json')
     shutil.copy2(lmo, output / lmo.name)
     report = {'checked': datetime.datetime.now(datetime.timezone.utc).isoformat(),
-              'baseline': '20261023-r4', 'profile': '20261029-r7', 'packages': len(names), 'luci_apps': len(required_apps),
+              'baseline': '20261023-r4', 'profile': '20261029-r8-honk', 'packages': len(names), 'luci_apps': len(required_apps),
               'images': images, 'kernel_flags_verified': flags, 'adguardhome_lmo_in_rootfs': True,
               'runtime_boot_tested_this_build': False, 'runtime_translation_http_tested_this_build': False}
     (output / 'build-verification.json').write_text(json.dumps(report, indent=2))

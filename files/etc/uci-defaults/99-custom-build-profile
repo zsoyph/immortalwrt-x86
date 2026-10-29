@@ -13,4 +13,7 @@ done
 if [ -x /etc/init.d/passwall ]; then
     /etc/init.d/passwall enable
 fi
+if [ -x /etc/init.d/honk ]; then
+    /etc/init.d/honk enable
+fi
 exit 0

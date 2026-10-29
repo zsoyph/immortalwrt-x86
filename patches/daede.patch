@@ -10,3 +10,15 @@ index 69a86be..25502f8 100644
  		pushd $(PKG_BUILD_DIR) ; \
  		export \
  		$(GO_GENERAL_BUILD_CONFIG_VARS) \
+diff --git a/daed/Makefile b/daed/Makefile
+--- a/daed/Makefile
++++ b/daed/Makefile
+@@ -20,7 +20,7 @@
+ DAED_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
+ PKG_BUILD_DIR:=$(DAED_BUILD_DIR)/wing
+ 
+-PKG_BUILD_DEPENDS:=golang/host bpf-headers
++PKG_BUILD_DEPENDS:=golang1.27/host bpf-headers
+ PKG_BUILD_PARALLEL:=1
+ PKG_BUILD_FLAGS:=no-mips16
+ 

@@ -1,0 +1,27 @@
+{
+  "profile": "20261029-r8-honk",
+  "integration_repository": "https://github.com/daeuniverse/openwrt-packages",
+  "integration_commit": "fcbc57abdec03713f877ed855d2c56a17429f35c",
+  "core_tag": "v0.1.0-beta.3",
+  "core_commit": "1b95e2e90ac949e248270a746058eaab3f7de381",
+  "core_artifact": "honk-core-v0.1.0-beta.3-x86_64-unknown-linux-musl-full.tar.gz",
+  "core_sha256": "101b1f9bed80eff0a9287fbb7a6d9b933f30e8d9b511fad738d48c501cb8e55c",
+  "core_build": "official prebuilt static musl full with real eBPF and embedded Doona; packaged by OpenWrt",
+  "doona_source": "https://github.com/daeuniverse/honk/releases/download/v0.1.0-beta.3/doona-source-0.1.0-rc.1.tar.gz",
+  "doona_source_sha256": "fe72c996baa3dd392cab58f24ff91a2b1175145dd9f3c6f9eb582cc1f03d1fb7",
+  "runtime_tested": false,
+  "package_sha256": {
+    "packages/honk/Makefile": "162bcb3789f6ddba0fc8f40777fce2340fcadc437dbe4bf454b441c2dfc05233",
+    "packages/honk/files/config.dae": "f995378fd27e2752e3f33e75dcff6adcae4df52e21669c8bf39d767f37d43344",
+    "packages/honk/files/honk.config": "1267120ca7708ea7608b477c4bf59a11a9355144e0e132589b7363713ff28fc5",
+    "packages/honk/files/honk.init": "1273a0ab621adc3baa864a528786f41ed5f12058fe455008ba6c55581ba5adea",
+    "packages/luci-app-honk/Makefile": "2014769379928e79c42366e7e2a7e520a6cc3eec3b793b46fc7f211a45b1324f",
+    "packages/luci-app-honk/root/usr/share/rpcd/acl.d/luci-app-honk.json": "b4b882f43d3ea9c3dcb8b9eff4ab04615a278a1b9ea8d6809969a891b264d7f5",
+    "packages/luci-app-honk/root/usr/share/luci/menu.d/luci-app-honk.json": "5d6ab325e767f7fda7bfbc83a91fa22c131b0ddd5395c175a25898685adccb9a",
+    "packages/luci-app-honk/htdocs/luci-static/resources/view/honk/main.js": "5c2eacfc96edf8f19db593a02a5599d8bc17392974ff035aadd780a3b9f269c7",
+    "packages/luci-lib-daeuniverse/Makefile": "4f5efd215855ba95999818814bbbecbdc537e3195ae0739fbbcf44b66e512a45",
+    "packages/luci-lib-daeuniverse/po/zh_Hans/daeuniverse.po": "2c78205ce796cfd3b0b7e32ae5ef5f80b56fa73ffa93c7b8aef38cf35a0f3dce",
+    "packages/luci-lib-daeuniverse/po/zh_Hant/daeuniverse.po": "c9024594ed8e234f792ee26045c1bd7f89c268c2200ccf91a104cf44f28871e1",
+    "packages/luci-lib-daeuniverse/htdocs/luci-static/resources/daeuniverse/service.js": "400103de610c4153dc5b816caff311dda4d20e1b11e6597e3b7cb50ea57b8db3"
+  }
+}
