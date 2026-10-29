@@ -112,12 +112,14 @@
     "overlays/packages/net/openlist/Makefile": "17e4b6a88ebb819d9aef8a3142ceb47c394db9e2bdaf91b14a09e1d2138370ab",
     "overlays/packages/net/openvpn/Makefile": "d63e11a4d1861d88605099af93e6b2b65e36beda8de2f3db6685c4777f0108ea",
     "overlays/packages/net/tailscale/Makefile": "b5969b60fcabe9c0acb80c7977140b93c7182e096bc6f1f856124db7ef9f35c9",
+    "overlays/packages/net/xray-core/Makefile": "8dc8a529179241d29b822ac9e4776ed765583c9f29397a2986ad0c82117bba13",
     "overlays/nikki/mihomo-meta/Makefile": "4b0df42887c0d908f6fa9c0d4194eb667469170b8e8022387efc4657fae77192"
   },
   "host_toolchains": {
     "default": "unchanged Go 1.26",
     "openlist": "Go 1.27.3",
     "tailscale": "Go 1.27.3",
-    "source": "packages-updates/lang/golang/golang1.27"
+    "source": "packages-updates/lang/golang/golang1.27",
+    "xray-core": "Go 1.27.3"
   }
 }
