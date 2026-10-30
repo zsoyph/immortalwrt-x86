@@ -5,8 +5,8 @@
   "latest_tag": "v7.0.1",
   "selection": "latest official source commit, not a formal 7.0.2 release",
   "kernel": "6.12.103",
-  "menu": "\u670d\u52a1/\u5e94\u7528\u8fc7\u6ee4",
-  "default_service": "disabled; enable appfilter via System/Startup to begin monitoring",
-  "patch_sha256": "acf306ddb630ddf90a854000b6c4bbd826c55661538ebf06c9af9619832b55b1",
+  "menu": "服务/应用过滤",
+  "default_service": "disabled; enable appfilter via System/Startup to begin monitoring; init script ships outside the package file list so the build rootfs has no S*appfilter entry",
+  "patch_sha256": "a81d0a7727a87550f74e86cf1fdb9f441c437649ecc762679fad55eae70695c6",
   "runtime_tested": false
 }
