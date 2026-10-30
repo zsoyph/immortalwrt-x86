@@ -1,4 +1,37 @@
-# 当前构建：r8 Honk 云编译
+# ImmortalWrt x86/64 r9：OAF + Honk
+
+[![Build](https://github.com/zsoyph/immortalwrt-x86/actions/workflows/build-immortalwrt.yml/badge.svg)](https://github.com/zsoyph/immortalwrt-x86/actions/workflows/build-immortalwrt.yml)
+
+当前版本 **25.12.2 / Linux 6.12.103**，新增 OpenAppFilter/OAF 官方最新源码 **7.0.2**，最新正式发布tag仍为7.0.1。锁定源码提交，针对本内核自行编译，不混装其他固件kmod。42个应用、706选包，原41应用含Honk及冻结版本完整保留。Netdata/EasyTier不升级。
+
+## OAF 使用
+
+菜单【服务 → 应用过滤】。默认不启用appfilter启动项；需要使用时在【系统 → 启动项】启用并启动appfilter，再配置过滤规则。包中已建立配置文件。特征识别受加密、特征库和代理/eBPF绕行影响，不承诺识别全部Honk/DAE代理流量。
+
+后端7.0.2-r2，LuCI7.0-r2，kmod-oaf6.12.103-r1；本地修订用于配置安装及加速设置适配。OAF“关闭加速”只处理流量卸载，不自动关闭TurboACC的全锥形或BBR。源码和适配见 [oaf.lock.json](oaf.lock.json)、[r9说明](docs/r9-oaf.md)、[适配补丁](patches/oaf.patch)。GPL许可证和原作者引用保留。
+
+为排除旧feed同名配方，准备脚本只移除旧open-app-filter的feed入口；新内核模块、后端、LuCI分别来自同一锁定官方源码，后端使用custom/oaf-daemon。其余已选插件保留。
+
+## 云编译与产物
+
+[Actions](https://github.com/zsoyph/immortalwrt-x86/actions/workflows/build-immortalwrt.yml) 可手动运行，main配置变更自动触发。成功后在该次运行Artifacts下载 **immortalwrt-25.12.2-x86-64-r9-oaf-运行编号**，保留14天，诊断日志7天。仅所有成品校验通过后上传固件，不自动发布Release，不刷机部署，不需局域网凭据。
+
+四种ext4/squashfs BIOS/UEFI整盘镜像，启动128MiB/根4096MiB；默认192.168.1.1、root、初始空密码。原生fw4/nftables，iptables-nft兼容且无legacy；TurboACC BBR/FQ/IPv4全锥形默认开，软件/硬件/SFE卸载默认关。标准Bandix、AdGuard中文和PassWall系统启动入口修复保留。
+
+云端核对完整基线包、42应用、升级/冻结版本、分区、SHA256、内核/eBPF、Honk及OAF模块/菜单/中文资源/默认设置。未做本轮云端隔离启动或流量识别测试；历史本地测试不能代替。
+
+## 构建
+
+    bash scripts/install-dependencies.sh
+    python3 scripts/check-project.py
+    python3 scripts/prepare.py
+    bash scripts/build.sh
+
+依赖来源见 [sources.lock.json](sources.lock.json)、[updates.lock.json](updates.lock.json)、[Honk锁](honk.lock.json)。引用和许可见 [致谢](ACKNOWLEDGEMENTS.md)。
+
+---
+
+# 沿用的 r8 Honk 说明（历史）
 
 Honk **v0.1.0-beta.3（预发布版）**，保留 r7 完整应用及锁定版本、PassWall 启动入口修复，Netdata/EasyTier不升级。系统25.12.2/Linux6.12.103，41应用/702选包，128/4096MiB分区。
 
@@ -6,7 +39,7 @@ Honk **v0.1.0-beta.3（预发布版）**，保留 r7 完整应用及锁定版本
 
 官方来源和SHA256见 [honk.lock.json](honk.lock.json)，[适配说明](docs/r8-honk.md)。核心GPL及Doona第三方声明随固件保留。DAED使用Go1.27.3修复旧配方编译器版本不足。
 
-云端产物 immortalwrt-25.12.2-x86-64-r8-honk-运行编号 保留14天，诊断7天。只在全部成品检查成功后上传固件。云端未做本轮隔离启动和Honk实际流量测试，历史本地测试不能代替。
+云端产物 immortalwrt-25.12.2-x86-64-r9-oaf-运行编号 保留14天，诊断7天。只在全部成品检查成功后上传固件。云端未做本轮隔离启动和Honk实际流量测试，历史本地测试不能代替。
 
 ---
 
@@ -18,7 +51,7 @@ ImmortalWrt **25.12.2 / Linux 6.12.103**，x86/64。r6 用 **TurboACC 1.4** 替�
 
 ## 云编译与下载
 
-打开 [Actions](https://github.com/zsoyph/immortalwrt-x86/actions/workflows/build-immortalwrt.yml)，选择 **Run workflow**。main 的构建配置或源码变化也会触发。成功后在本次运行的 Artifacts 下载 `immortalwrt-25.12.2-x86-64-r8-honk-运行编号`，保留 **14 天**；诊断日志保留 7 天。不自动发布 Release、不刷机，不需要个人令牌或局域网编译机凭据。云端使用 GitHub 托管 Ubuntu 24.04，工作流只申请 contents:read。
+打开 [Actions](https://github.com/zsoyph/immortalwrt-x86/actions/workflows/build-immortalwrt.yml)，选择 **Run workflow**。main 的构建配置或源码变化也会触发。成功后在本次运行的 Artifacts 下载 `immortalwrt-25.12.2-x86-64-r9-oaf-运行编号`，保留 **14 天**；诊断日志保留 7 天。不自动发布 Release、不刷机，不需要个人令牌或局域网编译机凭据。云端使用 GitHub 托管 Ubuntu 24.04，工作流只申请 contents:read。
 
 ## 本版配置
 

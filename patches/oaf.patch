@@ -1,0 +1,82 @@
+--- a/open-app-filter/files/hnat.sh
++++ b/open-app-filter/files/hnat.sh
+@@ -26,19 +26,15 @@
+ }   
+                                    
+ if [ $IS_BOOT -ne 1 ] ; then
+-    # turbo acc
+-    test -f /etc/config/turboacc && {
+-        uci -q set "turboacc.config.fastpath_fo_hw"="0"
+-        uci -q set "turboacc.config.fastpath_fc_ipv6"="0"
+-        uci -q set "turboacc.config.fastpath"="none"
+-        uci -q set "turboacc.config.fullcone"="0"
+-        uci commit turboacc
+-        /etc/init.d/turboacc restart
+-    }
+-
+-    uci -q set "firewall.@defaults[0].flow_offloading_hw"='0'
+-    uci -q set "firewall.@defaults[0].flow_offloading"='0'
+-    uci -q set "firewall.@defaults[0].fullcone"='0'
++    # Native fw4/TurboACC: disable only flow offload; retain FullCone and BBR.
++    if [ -f /etc/config/turboacc ]; then
++        uci -q set 'turboacc.config.sw_flow=0'
++        uci -q set 'turboacc.config.hw_flow=0'
++        uci -q set 'turboacc.config.sfe_flow=0'
++        uci -q commit turboacc
++    fi
++    uci -q set 'firewall.@defaults[0].flow_offloading_hw=0'
++    uci -q set 'firewall.@defaults[0].flow_offloading=0'
+     uci commit firewall
+ 
+     /etc/init.d/firewall reload
+--- a/luci-app-oaf/luasrc/controller/oaf.lua
++++ b/luci-app-oaf/luasrc/controller/oaf.lua
+@@ -1,5 +1,5 @@
+ module("luci.controller.oaf", package.seeall)
+ 
+ function index()
+-    entry({"admin", "services", "oaf"}, firstchild(), _("Parental Control"), 20).dependent = true
++    entry({"admin", "services", "oaf"}, firstchild(), "应用过滤", 20).dependent = true
+ end
+--- a/open-app-filter/Makefile
++++ b/open-app-filter/Makefile
+@@ -3,7 +3,8 @@
+ 
+ PKG_NAME:=appfilter
+ PKG_VERSION:=7.0.2
+-PKG_RELEASE:=1
++PKG_RELEASE:=2
++PKG_LICENSE:=GPL-2.0-or-later
+ 
+ PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
+ include $(INCLUDE_DIR)/package.mk
+@@ -41,6 +42,13 @@
+ define Package/appfilter/conffiles
+ /etc/fwxd/custom_feature.cfg
+ /etc/config/fwx
++/etc/config/appfilter
++/etc/config/appfilter_whitelist
++/etc/config/fwx_record
++/etc/config/macfilter
++/etc/config/macfilter_whitelist
++/etc/config/mac_blacklist
++/etc/config/user_info
+ endef
+ 
+ 
+@@ -49,6 +57,15 @@
+ 	$(INSTALL_DIR) $(1)/etc/fwxd
+ 	$(INSTALL_DIR) $(1)/etc/config
+ 	$(INSTALL_DIR) $(1)/usr/share/rpcd/acl.d/
++	$(INSTALL_CONF) ./files/fwx.config $(1)/etc/config/fwx
++	$(INSTALL_CONF) ./files/appfilter.config $(1)/etc/config/appfilter
++	$(INSTALL_CONF) ./files/appfilter_whitelist.config $(1)/etc/config/appfilter_whitelist
++	$(INSTALL_CONF) ./files/fwx_record.config $(1)/etc/config/fwx_record
++	$(INSTALL_CONF) ./files/macfilter.config $(1)/etc/config/macfilter
++	$(INSTALL_CONF) ./files/macfilter_whitelist.config $(1)/etc/config/macfilter_whitelist
++	$(INSTALL_CONF) ./files/mac_blacklist.config $(1)/etc/config/mac_blacklist
++	$(INSTALL_CONF) ./files/user_info.config $(1)/etc/config/user_info
++
+ 	$(INSTALL_DATA) ./files/feature.bin $(1)/etc/fwxd/feature.bin
+ 	$(INSTALL_DATA) ./files/custom_feature.cfg $(1)/etc/fwxd/custom_feature.cfg
+ 	$(INSTALL_BIN) ./files/appfilter.init $(1)/etc/init.d/appfilter

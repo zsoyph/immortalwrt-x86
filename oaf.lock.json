@@ -1,0 +1,12 @@
+{
+  "repository": "https://github.com/destan19/OpenAppFilter",
+  "commit": "0814b87f57181ef238b9a21604c999e98de73cf2",
+  "source_version": "7.0.2",
+  "latest_tag": "v7.0.1",
+  "selection": "latest official source commit, not a formal 7.0.2 release",
+  "kernel": "6.12.103",
+  "menu": "\u670d\u52a1/\u5e94\u7528\u8fc7\u6ee4",
+  "default_service": "disabled; enable appfilter via System/Startup to begin monitoring",
+  "patch_sha256": "acf306ddb630ddf90a854000b6c4bbd826c55661538ebf06c9af9619832b55b1",
+  "runtime_tested": false
+}

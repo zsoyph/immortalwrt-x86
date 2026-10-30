@@ -84,7 +84,11 @@
     "packages-stable": {
       "url": "https://github.com/immortalwrt/packages.git",
       "commit": "6f8f6461e8a6a0bbc134592d12353700fe698506"
+    },
+    "oaf": {
+      "url": "https://github.com/destan19/OpenAppFilter.git",
+      "commit": "0814b87f57181ef238b9a21604c999e98de73cf2"
     }
   },
-  "profile": "20261029-r7"
+  "profile": "20261030-r9-oaf"
 }

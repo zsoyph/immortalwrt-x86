@@ -65,6 +65,9 @@ def main():
     shutil.copyfile(PROJECT / 'translations/adguardhome.zh_Hans.po', po)
     shutil.copyfile(PROJECT / 'configs/feeds.conf', core / 'feeds.conf')
     links = {
+        'oaf-kernel': paths['oaf'] / 'oaf',
+        'oaf-daemon': paths['oaf'] / 'open-app-filter',
+        'luci-app-oaf': paths['oaf'] / 'luci-app-oaf',
         'daede': paths['daede'], 'istore': paths['istore'],
         # The accepted configuration uses the stable core. Loading the unused
         # alpha recipe as well creates a mutual-CONFLICTS Kconfig cycle.
@@ -99,7 +102,7 @@ def main():
         (custom / name).symlink_to(source, target_is_directory=True)
     run(['./scripts/feeds', 'update', '-i', 'packages', 'luci', 'routing'], core)
     run(['./scripts/feeds', 'install', '-a'], core)
-    for name in ['dae', 'daed', 'luci-app-dae', 'luci-app-daed']:
+    for name in ['dae', 'daed', 'luci-app-dae', 'luci-app-daed', 'open-app-filter']:
         for link in (core / 'package/feeds').glob('*/' + name):
             if link.is_symlink():
                 link.unlink()
@@ -116,7 +119,7 @@ def main():
     resolved = (core / '.config').read_text(encoding='utf-8')
     missing, extra = selected(seed) - selected(resolved), selected(resolved) - selected(seed)
     assert not missing and not extra, {'packages_missing': sorted(missing), 'packages_extra': sorted(extra)}
-    assert len([name for name in selected(resolved) if name.startswith('luci-app-') and '_' not in name]) == 41
+    assert len([name for name in selected(resolved) if name.startswith('luci-app-') and '_' not in name]) == 42
     assert 'CONFIG_TARGET_ROOTFS_PARTSIZE=4096' in resolved
     assert 'CONFIG_TARGET_KERNEL_PARTSIZE=128' in resolved
     (work / 'preparation.json').write_text(json.dumps({

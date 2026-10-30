@@ -96,7 +96,10 @@
     "sqm-scripts": "1.8.0-r1",
     "honk": "0.1.0_beta3-r1",
     "luci-app-honk": "2026.10.29-r1",
-    "luci-lib-daeuniverse": "2026.10.29-r1"
+    "luci-lib-daeuniverse": "2026.10.29-r1",
+    "appfilter": "7.0.2-r2",
+    "luci-app-oaf": "7.0-r2",
+    "kmod-oaf": "6.12.103-r1"
   },
   "frozen_versions": {
     "netdata": "1.38.1-r3",
