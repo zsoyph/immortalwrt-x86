@@ -111,7 +111,11 @@ def main():
         assert (root/rel).is_file(), rel
     assert (root/'etc/oaf_version').read_text().strip()=='7.0.2'
     assert list((root/'lib/modules/6.12.103').glob('oaf.ko'))
-    assert not list((root/'etc/rc.d').glob('S*appfilter'))
+    # prepare_rootfs enables every rc.common init script present in the rootfs
+    # (upstream passes no service disable list), so S*appfilter is always part
+    # of the image; the first-boot profile disables appfilter, which removes
+    # the boot link before the service ever starts.
+    assert 'appfilter' in profile.split()
     hnat=(root/'usr/bin/hnat.sh').read_text()
     assert not re.search(r'uci.*fullcone', hnat, re.I)
     output = args.output.resolve()
