@@ -113,8 +113,8 @@ def main():
     assert list((root/'lib/modules/6.12.103').glob('oaf.ko'))
     # prepare_rootfs enables every rc.common init script present in the rootfs
     # (upstream passes no service disable list), so S*appfilter is always part
-    # of the image; the first-boot profile disables appfilter, which removes
-    # the boot link before the service ever starts.
+    # of the image; the first-boot profile keeps appfilter in its enable list
+    # so the service survives reboots like the rest of the bundle.
     assert 'appfilter' in profile.split()
     hnat=(root/'usr/bin/hnat.sh').read_text()
     assert not re.search(r'uci.*fullcone', hnat, re.I)

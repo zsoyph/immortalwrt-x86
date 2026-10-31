@@ -6,7 +6,7 @@
   "selection": "latest official source commit, not a formal 7.0.2 release",
   "kernel": "6.12.103",
   "menu": "服务/应用过滤",
-  "default_service": "disabled; enable appfilter via System/Startup to begin monitoring; the first-boot profile disables it, which removes the rc.d boot link",
+  "default_service": "enabled at boot together with the bundled services; configured via the VPN/LuCI pages, no manual System/Startup step needed",
   "patch_sha256": "008bafc833b2c06bac08799196048a1cb691822b4415fab93ab175bacc18c9e1",
   "runtime_tested": false
 }

@@ -1,13 +1,21 @@
 #!/bin/sh
-# Optional applications are installed for configuration after first login.
+# Bundled services ship enabled so anything configured in LuCI keeps working
+# across reboots without a manual trip to System/Startup. Proxies and tunnels
+# also enable: their init scripts read the global UCI switch, which stays at
+# the upstream disabled default, so they idle harmlessly until configured.
 uci -q set system.@system[0].timezone='CST-8'
 uci -q set system.@system[0].zonename='Asia/Shanghai'
 uci -q commit system
-for service in appfilter bandix vlmcsd nikki wrtbwmon sqm mwan3 miniupnpd ddns ddns-go smartdns AdGuardHome adguardhome homeproxy openclash dae daed openvpn tailscale zerotier frpc frps dockerd samba4 aria2 openlist minidlna netdata autoreboot banip; do
+for service in appfilter bandix vlmcsd nikki wrtbwmon sqm mwan3 miniupnpd ddns ddns-go smartdns AdGuardHome adguardhome homeproxy openclash dae daed openvpn tailscale zerotier frpc frps dockerd samba4 aria2 openlist minidlna autoreboot banip; do
     if [ -x "/etc/init.d/$service" ]; then
-        "/etc/init.d/$service" disable
+        "/etc/init.d/$service" enable
     fi
 done
+# Netdata is the one exception: the feed 1.38 dashboard keeps stalling the
+# LuCI iframe (r9 history), so it stays off until the user opts in.
+if [ -x /etc/init.d/netdata ]; then
+    /etc/init.d/netdata disable
+fi
 # Keep the boot/config-change lifecycle available while the proxy's own global
 # switch stays at the upstream disabled default. Preserve any retained setting.
 if [ -x /etc/init.d/passwall ]; then
