@@ -60,6 +60,7 @@ ImmortalWrt **25.12.2 / Linux 6.12.103**，x86/64。r6 用 **TurboACC 1.4** 替�
 | 镜像 | ext4、squashfs，分别提供 BIOS/UEFI 整盘镜像 |
 | 分区 | 引导 128 MiB，根分区 4096 MiB |
 | 默认访问 | 192.168.1.1，root，初始密码为空，首次登录后设置 |
+| 网口规划 | eth0 作为 WAN（DHCP 上联），其余网口桥接进 br-lan 作为 LAN；单网口机型保持全 LAN |
 | 防火墙 | 原生 firewall4/nftables；保留 iptables-nft 兼容层，禁用 legacy |
 | 网络加速 | 网络 → Turbo ACC 网络加速；默认开启 BBR + FQ、IPv4 全锥形 NAT |
 | 流量卸载 | 软件、硬件、SFE 默认关闭，IPv6 全锥形默认关闭；不编译 SFE |

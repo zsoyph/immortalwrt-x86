@@ -1,0 +1,34 @@
+#!/bin/sh
+# Port plan: eth0 is the WAN uplink, every remaining NIC is a LAN member of
+# br-lan. Skipped on single-port machines so LAN never loses its only member.
+
+wan=eth0
+lan_ports=""
+for dev in $(ls /sys/class/net 2>/dev/null); do
+    case "$dev" in
+        eth[0-9]|eth[0-9][0-9]) [ "$dev" = "$wan" ] || lan_ports="$lan_ports $dev" ;;
+    esac
+done
+[ -n "$lan_ports" ] || exit 0
+
+# Drop the WAN port from every bridge that carries it.
+for section in $(uci -q show network | sed -n "s/^network\.\([^.]*\)\.type='bridge'\$/\1/p"); do
+    [ "$(uci -q get network.$section.name)" = "br-lan" ] || continue
+    uci -q del_list network.$section.ports="$wan"
+done
+
+# The WAN interface: reuse the stock section when one exists.
+if uci -q show network.wan >/dev/null 2>&1; then
+    uci -q set network.wan.device="$wan"
+    uci -q set network.wan.proto='dhcp'
+else
+    uci -q set network.wan=interface
+    uci -q set network.wan.device="$wan"
+    uci -q set network.wan.proto='dhcp'
+fi
+if uci -q show network.wan6 >/dev/null 2>&1; then
+    uci -q set network.wan6.device="$wan"
+fi
+
+uci -q commit network
+exit 0
