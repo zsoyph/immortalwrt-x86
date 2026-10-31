@@ -31,12 +31,15 @@
      /etc/init.d/firewall reload
 --- a/luci-app-oaf/luasrc/controller/oaf.lua
 +++ b/luci-app-oaf/luasrc/controller/oaf.lua
-@@ -1,5 +1,5 @@
+@@ -1,5 +1,8 @@
  module("luci.controller.oaf", package.seeall)
  
  function index()
 -    entry({"admin", "services", "oaf"}, firstchild(), _("Parental Control"), 20).dependent = true
 +    entry({"admin", "services", "oaf"}, firstchild(), "应用过滤", 20).dependent = true
++    -- The iStore quickstart home page links to /admin/services/appfilter.
++    local page = entry({"admin", "services", "appfilter"}, alias("admin", "services", "oaf"), "应用过滤")
++    page.hidden = true
  end
 --- a/open-app-filter/Makefile
 +++ b/open-app-filter/Makefile
