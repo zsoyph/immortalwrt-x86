@@ -3,11 +3,11 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=honk
-PKG_VERSION:=0.1.0_beta3
+PKG_VERSION:=0.1.0_beta6
 PKG_RELEASE:=1
-PKG_SOURCE:=honk-core-v0.1.0-beta.3-x86_64-unknown-linux-musl-full.tar.gz
-PKG_SOURCE_URL:=https://github.com/daeuniverse/honk/releases/download/v0.1.0-beta.3/
-PKG_HASH:=101b1f9bed80eff0a9287fbb7a6d9b933f30e8d9b511fad738d48c501cb8e55c
+PKG_SOURCE:=honk-core-v0.1.0-beta.6-x86_64-unknown-linux-musl-full.tar.gz
+PKG_SOURCE_URL:=https://github.com/daeuniverse/honk/releases/download/v0.1.0-beta.6/
+PKG_HASH:=2783b8f0856fc1aecd1cd1d911d9a904c593cd507cf61e5fa24fbd7075317244
 PKG_LICENSE:=GPL-3.0-only
 PKG_LICENSE_FILES:=LICENSE
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)

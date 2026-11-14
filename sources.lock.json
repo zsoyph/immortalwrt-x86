@@ -63,7 +63,7 @@
     },
     "partexp": {
       "url": "https://github.com/sirpdboy/luci-app-partexp.git",
-      "commit": "236187cfe4f1fab7f2dde5279ce378324c3e5f40"
+      "commit": "ef79d6b8c7f1e4d476be55dabb4c34d5b7f334c5"
     },
     "easytier": {
       "url": "https://github.com/EasyTier/luci-app-easytier.git",
@@ -88,6 +88,10 @@
     "oaf": {
       "url": "https://github.com/destan19/OpenAppFilter.git",
       "commit": "0814b87f57181ef238b9a21604c999e98de73cf2"
+    },
+    "packages-ddns": {
+      "url": "https://github.com/immortalwrt/packages.git",
+      "commit": "12ec335dae2fcfb84c5d33a5bfddfe84e10dc06d"
     }
   },
   "profile": "20261030-r9-oaf"

@@ -129,7 +129,7 @@ def main():
         assert (root / rel).is_file(), rel
     binary = root / 'usr/bin/honk-core'
     version = subprocess.check_output([str(binary), '--version'], text=True).strip()
-    assert '0.1.0-beta.3' in version, version
+    assert '0.1.0-beta.6' in version, version
     assert 'INTERP' not in subprocess.check_output(['readelf','-l',str(binary)],text=True)
     assert list((root / 'etc/rc.d').glob('S*honk'))
     menu = json.loads((root / 'usr/share/luci/menu.d/luci-app-honk.json').read_text())

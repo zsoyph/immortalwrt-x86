@@ -12,6 +12,18 @@
 
 为排除旧feed同名配方，准备脚本只移除旧open-app-filter的feed入口；新内核模块、后端、LuCI分别来自同一锁定官方源码，后端使用custom/oaf-daemon。其余已选插件保留。
 
+## 本轮升级（r10）
+
+| 项目 | 变更 | 锁定依据 |
+| --- | --- | --- |
+| ddns-scripts | 2.8.4-r8 → 2.8.5-r1 | immortalwrt/packages `12ec335d`（11-10，net/ddns-scripts 整目录） |
+| luci-app-partexp | `236187c` → `ef79d6b8` | sirpdboy 合入 overlay 拷贝修复，仅改 `root/usr/bin/partexp` |
+| Go 1.27 工具链 | 1.27.3 → 1.27.4 | 上游 `db68036` 两行补丁，本地 overlay 固定；供 Tailscale 1.104.7 使用 |
+| Tailscale | 1.104.6-r2 → 1.104.7-r1 | 官方 11-12 release，`go.mod` 要求 Go 1.27.4；源码包 hash 本地复算 |
+| Honk | beta.3 → beta.6 | 官方 11-08 预发布，x86_64 静态 musl full 包，Doona rc.6 源码归档同步 |
+
+ddns-scripts 取自滚动 master（相对稳定分支有服务商脚本增删），云端只校验包版本，未做 DDNS 上机实测；Honk beta.6 为预发布版，配置新增 `global.syslog_*` 等可选项，现有 `config.dae` 保持兼容。本轮未改动 OAF、OpenClash、PassWall、AGH、Xray、Mihomo、ddns-go、OpenList、OpenVPN、netdata、EasyTier 及 Tailscale 的 init/ucode 逻辑。
+
 ## 云编译与产物
 
 [Actions](https://github.com/zsoyph/immortalwrt-x86/actions/workflows/build-immortalwrt.yml) 可手动运行，main配置变更自动触发。成功后在该次运行Artifacts下载 **immortalwrt-25.12.2-x86-64-r9-oaf-运行编号**，保留14天，诊断日志7天。仅所有成品校验通过后上传固件，不自动发布Release，不刷机部署，不需局域网凭据。

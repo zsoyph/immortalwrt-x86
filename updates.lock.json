@@ -7,7 +7,7 @@
       "path": "net/adguardhome"
     },
     {
-      "source": "packages-stable",
+      "source": "packages-ddns",
       "target": "packages",
       "path": "net/ddns-scripts"
     },
@@ -80,8 +80,8 @@
     "daed": "2026.10.18-r2",
     "luci-app-daede": "1.15-r13",
     "ddns-go": "6.17.8-r1",
-    "ddns-scripts": "2.8.4-r8",
-    "ddns-scripts-services": "2.8.4-r8",
+    "ddns-scripts": "2.8.5-r1",
+    "ddns-scripts-services": "2.8.5-r1",
     "frpc": "0.71.1-r1",
     "frps": "0.71.1-r1",
     "luci-app-openclash": "0.48.002",
@@ -89,12 +89,12 @@
     "mihomo-meta": "1.19.34",
     "xray-core": "26.11.9-r1",
     "openlist": "4.2.9-r1",
-    "tailscale": "1.104.6-r2",
+    "tailscale": "1.104.7-r1",
     "zerotier": "1.16.2-r1",
     "openvpn-openssl": "2.7.9-r2",
     "miniupnpd-nftables": "2.3.11-r1",
     "sqm-scripts": "1.8.0-r1",
-    "honk": "0.1.0_beta3-r1",
+    "honk": "0.1.0_beta6-r1",
     "luci-app-honk": "2026.10.29-r1",
     "luci-lib-daeuniverse": "2026.10.29-r1",
     "appfilter": "7.0.2-r2",
@@ -118,18 +118,19 @@
     "overlays/packages/net/frp/Makefile": "7ddbf0e1f7be93a971745c9e2e313f1c8cc5a768ef50b05c2c9238a569ac2d32",
     "overlays/packages/net/openlist/Makefile": "17e4b6a88ebb819d9aef8a3142ceb47c394db9e2bdaf91b14a09e1d2138370ab",
     "overlays/packages/net/openvpn/Makefile": "6f7b8f4d282211e5710b2316b7cb6fba60d5630f064f69beefdb6697ad78847b",
-    "overlays/packages/net/tailscale/Makefile": "441346ee8e0c3a06d9b31a8f360960eee0483e6481404285ca8f290d4d864412",
+    "overlays/packages/net/tailscale/Makefile": "8c3b24758a594c878a036c0b867a158a8c42b900cbbd5e278045130c95b6a19f",
     "overlays/packages/net/xray-core/Makefile": "2fc4340f04827a1bdf01b7dc63f40cf9b6aa3636905162ef6000f15878dadcbf",
-    "overlays/nikki/mihomo-meta/Makefile": "2abd6c7a52efc35956e308fb768be45a0143da35782a078f31a45f7491d4115f"
+    "overlays/nikki/mihomo-meta/Makefile": "2abd6c7a52efc35956e308fb768be45a0143da35782a078f31a45f7491d4115f",
+    "overlays/packages/lang/golang/golang1.27/Makefile": "108138308e7c8d39729b3802a1c7697b19fa061d9376b8f7937e49f71b7288e1"
   },
   "host_toolchains": {
     "default": "unchanged Go 1.26",
-    "adguardhome": "Go 1.27.3 (0.107.80 go.mod requires >=1.27.3)",
-    "tailscale_note": "1.104.6 selected; 1.104.7 requires Go 1.27.4",
-    "openlist": "Go 1.27.3",
-    "tailscale": "Go 1.27.3",
-    "source": "packages-updates/lang/golang/golang1.27",
-    "xray-core": "Go 1.27.3",
-    "daed": "Go 1.27.3 (upstream go.mod requires >=1.26.10; baseline host is 1.26.8)"
+    "adguardhome": "Go 1.27.4 (0.107.80 go.mod requires >=1.27.3)",
+    "tailscale_note": "1.104.7 selected; go.mod requires Go 1.27.4, supplied by the golang1.27 overlay",
+    "openlist": "Go 1.27.4",
+    "tailscale": "Go 1.27.4",
+    "source": "packages-updates/lang/golang/golang1.27 + local 1.27.4 overlay",
+    "xray-core": "Go 1.27.4",
+    "daed": "Go 1.27.4 (upstream go.mod requires >=1.26.10; baseline host is 1.26.8)"
   }
 }
