@@ -101,6 +101,8 @@ bash scripts/build.sh
 
 prepare 拒绝覆盖已有工作目录；可指定 `--work /new/path`，build.sh 同步传入此路径。下载、工具链、内核与软件包分阶段构建，最终单路打包。镜像零填充改为稀疏复制与按相同块边界扩展，避免为 4GiB 块申请巨量内存；输入边界测试与旧 dd 方法逐字节比对。实际分区和镜像哈希仍须通过成品检查。
 
+rust 宿主工具链（供 Shadowsocks-Rust 等使用）原本会下载 rustc CI 的预编译 LLVM，但该 CI 产物会被上游定期清理，1.96.0 对应的地址已返回 404，且官方 dist 不再发布 `rust-dev` 组件。[适配补丁](patches/packages.patch) 关闭 `llvm.download-ci-llvm`，改用 `rustc-1.96.0-src` 自带的 `src/llvm-project` 本地编译 LLVM（已核验源码在包内），并让 runner 安装 `ninja-build` 加速；代价是每次全新构建多一段 LLVM 编译时间，但不再依赖会被删除的外部产物。
+
 本次云构建核验四镜像、分区、SHA256、包清单、移除项、BBR/FQ/eBPF、TurboACC 页面/中文资源/默认值，以及旧独立 BBR 页面和服务确实移除。只有通过后才上传固件。云构建 **不做启动、实际 NAT/代理/吞吐运行测试**，报告明确记录为 false。本地 r6 编译成功不代表本次云任务已通过。历史 r4 测试仅作背景，见 docs/baseline-r4。
 
 ## 已知限制

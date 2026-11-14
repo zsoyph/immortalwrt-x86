@@ -56,3 +56,7 @@ assert {'honk','luci-app-honk','luci-lib-daeuniverse','kmod-nft-queue','kmod-nfn
 oaf = json.loads((root / 'oaf.lock.json').read_text())
 assert {'appfilter','kmod-oaf','luci-app-oaf','luci-i18n-oaf-zh-cn'} <= selected
 assert hashlib.sha256((root/'patches/oaf.patch').read_bytes()).hexdigest() == oaf['patch_sha256']
+
+# The rustc CI LLVM artifact for 1.96.0 is pruned upstream (HTTP 404), so the
+# host rust recipe must build the LLVM sources shipped inside rustc-src instead.
+assert '--set=llvm.download-ci-llvm=false' in (root/'patches/packages.patch').read_text(encoding='utf-8')

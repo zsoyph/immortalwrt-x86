@@ -7,6 +7,6 @@ sudo apt-get install -y build-essential gcc-multilib g++-multilib git subversion
   python3-pyelftools python3-setuptools rsync swig unzip wget zlib1g-dev \
   zstd dwarves bison libgnutls28-dev libgmp-dev libmpc-dev libmpfr-dev \
   libtool autoconf automake autopoint help2man gperf texinfo time jq \
-  libfuse-dev liblzma-dev libzstd-dev
+  libfuse-dev liblzma-dev libzstd-dev ninja-build
 printf 'int x;\n' | clang -target bpf -O2 -g -x c -c - -o /tmp/immortalwrt-bpf-smoke.o
 file /tmp/immortalwrt-bpf-smoke.o

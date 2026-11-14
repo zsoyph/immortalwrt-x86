@@ -10,3 +10,15 @@ index d145b34..a9ab4fb 100644
  #
  # Copyright (C) 2020, 2022 Jeffery To
  #
+diff --git a/lang/rust/Makefile b/lang/rust/Makefile
+--- a/lang/rust/Makefile
++++ b/lang/rust/Makefile
+@@ -74,7 +74,7 @@
+ 	--dist-compression-formats=gz \
+ 	--disable-sanitizers \
+ 	--release-channel=stable \
+ 	--enable-cargo-native-static \
+ 	--bootstrap-cache-path=$(DL_DIR)/rustc \
+-	--set=llvm.download-ci-llvm=true \
++	--set=llvm.download-ci-llvm=false \
+ 	$(TARGET_CONFIGURE_ARGS)
