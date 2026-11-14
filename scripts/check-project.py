@@ -29,11 +29,13 @@ assert 'CONFIG_TARGET_ROOTFS_PARTSIZE=4096' in config
 po = (root / 'translations/adguardhome.zh_Hans.po').read_text(encoding='utf-8')
 assert len(re.findall(r'^msgid ".+"$', po, re.M)) == 36
 assert '未知版本' in po
-for directory in ['packages', 'configs', 'files', 'patches', 'scripts', 'translations', 'docs', '.github', 'overlays']:
+for directory in ['packages', 'configs', 'files', 'patches', 'scripts', 'translations', 'docs', '.github', 'overlays', 'tools']:
     for file in (root / directory).rglob('*'):
         if not file.is_file() or '__pycache__' in file.parts:
             continue
-        content = file.read_text(encoding='utf-8')
+        # Byte-wise read with replacement: ELF binaries (e.g. the patched
+        # quickstart) must still be scanned without breaking on non-UTF-8 data.
+        content = file.read_bytes().decode('utf-8', errors='replace')
         assert not re.search(r'192\.168\.100\.7|awol[0-9]{4}|gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|-----BEGIN (?:OPENSSH|RSA|EC) PRIVATE KEY-----', content), str(file)
 print(json.dumps({'source_repositories': len(lock['repositories']), 'config_selected_symbols': len(selected),
                   'luci_apps': 42, 'translation_entries': 36,

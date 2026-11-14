@@ -2,3 +2,5 @@
 *.patch text eol=lf -whitespace
 *.po text eol=lf
 *.sh text eol=lf
+# Patched Go ELF shipped as-is: never let auto-CRLF or text conversion touch it.
+files/usr/sbin/quickstart binary

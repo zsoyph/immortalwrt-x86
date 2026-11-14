@@ -112,6 +112,12 @@ def main():
             file.chmod(0o755)
     for file in (core / 'files/etc/uci-defaults').iterdir():
         file.chmod(0o755)
+    # Windows checkouts do not preserve the executable bit, so make sure the
+    # patched quickstart binary is executable on the Linux build runner.
+    sbin = core / 'files/usr/sbin'
+    if sbin.is_dir():
+        for file in sbin.iterdir():
+            file.chmod(0o755)
     seed = (PROJECT / 'configs/x86-64.config').read_text(encoding='utf-8')
     assert 'mihomo-meta' in selected(seed) and 'mihomo-alpha' not in selected(seed), 'r4 requires the selected stable Mihomo core'
     (core / '.config').write_text(seed)

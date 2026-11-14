@@ -1,0 +1,41 @@
+#!/bin/sh
+# Keep the NJU / ImmortalWrt quickstart patch across package upgrades.
+#
+# The image already ships the patched binary (md5 3476eec5...). On first boot
+# keep a copy in /root and install an idempotent rc.local guard: when an
+# `apk upgrade` of quickstart restores the stock 0.13.0 binary
+# (md5 d510ae81...), put the patched copy back automatically. A genuinely NEW
+# upstream version has a different md5 and is deliberately left alone.
+
+bin=/usr/sbin/quickstart
+backup=/root/quickstart.patched-immortal
+rc=/etc/rc.local
+
+[ -f "$bin" ] || exit 0
+# Belt and braces: restore the executable bit even if the image builder lost it.
+chmod 755 "$bin" || exit 1
+cp "$bin" "$backup" 2>/dev/null || exit 1
+chmod 644 "$backup"
+
+[ -f "$rc" ] || printf '#!/bin/sh\n\nexit 0\n' > "$rc"
+if ! grep -q 'qs-guard' "$rc"; then
+    # Drop the stock trailing "exit 0" and append the guard instead.
+    sed -i '/^exit[[:space:]][[:space:]]*0[[:space:]]*$/d' "$rc"
+    cat >> "$rc" <<'EOF'
+
+# quickstart 补丁守卫：包升级把二进制还原成官方原版时，自动恢复南大 immortal 补丁版
+if command -v md5sum >/dev/null 2>&1 && [ -f /root/quickstart.patched-immortal ]; then
+    cur=$(md5sum /usr/sbin/quickstart 2>/dev/null | awk '{print $1}')
+    if [ "$cur" = "d510ae81ed99e30f1ab0ff1fcb204689" ]; then
+        logger -t qs-guard "stock quickstart detected, restoring patched binary"
+        cp /root/quickstart.patched-immortal /usr/sbin/quickstart
+        chmod 755 /usr/sbin/quickstart
+        /etc/init.d/quickstart restart
+    fi
+fi
+
+exit 0
+EOF
+fi
+chmod 755 "$rc"
+exit 0

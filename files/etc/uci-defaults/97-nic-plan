@@ -1,34 +1,61 @@
 #!/bin/sh
-# Port plan: eth0 is the WAN uplink, every remaining NIC is a LAN member of
-# br-lan. Skipped on single-port machines so LAN never loses its only member.
+# First-boot port plan: eth0 is the WAN uplink, every other physical eth*
+# port belongs to br-lan. Runs from /etc/uci-defaults after board detection
+# has generated /etc/config/network, so the stock layout is already present.
+#
+# Non-destructive on re-flash: an existing WAN protocol (PPPoE credentials,
+# static address, ...) and the LAN IP are never overwritten.
 
 wan=eth0
+[ -d "/sys/class/net/$wan" ] || exit 0
+
 lan_ports=""
 for dev in $(ls /sys/class/net 2>/dev/null); do
     case "$dev" in
-        eth[0-9]|eth[0-9][0-9]) [ "$dev" = "$wan" ] || lan_ports="$lan_ports $dev" ;;
+        eth[0-9]|eth[0-9][0-9])
+            [ "$dev" = "$wan" ] || lan_ports="$lan_ports $dev"
+            ;;
     esac
 done
+# Single-port machines keep the stock all-LAN layout.
 [ -n "$lan_ports" ] || exit 0
 
-# Drop the WAN port from every bridge that carries it.
-for section in $(uci -q show network | sed -n "s/^network\.\([^.]*\)\.type='bridge'\$/\1/p"); do
-    [ "$(uci -q get network.$section.name)" = "br-lan" ] || continue
-    uci -q del_list network.$section.ports="$wan"
+# Locate the br-lan device section; create a named one when missing.
+br=""
+for section in $(uci -q show network | sed -n "s/^network\.\([^.]*\)\.name='br-lan'\$/\1/p"); do
+    br="$section"
+    break
+done
+if [ -z "$br" ]; then
+    uci -q set network.br_lan='device'
+    br='br_lan'
+fi
+uci -q set network.$br.name='br-lan'
+uci -q set network.$br.type='bridge'
+# Replace the whole port list. The stock image only bridges one port, so
+# removing eth0 alone would leave an empty bridge with no LAN connectivity.
+uci -q delete network.$br.ports
+for port in $lan_ports; do
+    uci -q add_list network.$br.ports="$port"
 done
 
-# The WAN interface: reuse the stock section when one exists.
-if uci -q show network.wan >/dev/null 2>&1; then
-    uci -q set network.wan.device="$wan"
-    uci -q set network.wan.proto='dhcp'
-else
-    uci -q set network.wan=interface
-    uci -q set network.wan.device="$wan"
-    uci -q set network.wan.proto='dhcp'
-fi
+uci -q show network.lan >/dev/null 2>&1 || uci -q set network.lan='interface'
+uci -q set network.lan.device='br-lan'
+[ -n "$(uci -q get network.lan.proto)" ] || uci -q set network.lan.proto='static'
+
+uci -q show network.wan >/dev/null 2>&1 || uci -q set network.wan='interface'
+uci -q set network.wan.device="$wan"
+# Keep an existing protocol: PPPoE users must not lose their credentials on
+# a config-preserving sysupgrade.
+[ -n "$(uci -q get network.wan.proto)" ] || uci -q set network.wan.proto='dhcp'
+
+# wan6 tracks the physical port only when it is not an @wan alias (PPPoE).
 if uci -q show network.wan6 >/dev/null 2>&1; then
-    uci -q set network.wan6.device="$wan"
+    case "$(uci -q get network.wan6.device)" in
+        ''|@*) : ;;
+        *) uci -q set network.wan6.device="$wan" ;;
+    esac
 fi
 
-uci -q commit network
+uci -q commit network || exit 1
 exit 0

@@ -75,7 +75,7 @@
     },
     "luci-updates": {
       "url": "https://github.com/immortalwrt/luci.git",
-      "commit": "c84adb975e207ae8b14982191838ec6218d632cd"
+      "commit": "8f18275bb510818c501e4b124f872b6d30573d8a"
     },
     "packages-updates": {
       "url": "https://github.com/immortalwrt/packages.git",

@@ -58,6 +58,10 @@ def main():
     updates = json.loads((PROJECT / 'updates.lock.json').read_text())
     for package, expected in {**updates['frozen_versions'], **updates['expected_versions']}.items():
         assert versions.get(package) == expected, (package, versions.get(package), expected)
+    # The bundled quickstart ELF is patched against 0.13.0 byte offsets. Fail
+    # loudly if the feed ever ships a different binary instead of silently
+    # overwriting it with an incompatible patch build.
+    assert versions.get('quickstart', '').startswith('0.13.0'), versions.get('quickstart')
     images = []
     for filesystem in ['ext4', 'squashfs']:
         for boot in ['combined', 'combined-efi']:
@@ -71,6 +75,20 @@ def main():
     flags = ['BPF', 'BPF_SYSCALL', 'BPF_JIT', 'DEBUG_INFO_BTF', 'CGROUP_BPF', 'NET_CLS_BPF', 'NET_ACT_BPF', 'TCP_CONG_BBR', 'NET_SCH_FQ', 'NET_SCHED', 'NET_CLS_ACT', 'NET_XGRESS', 'NET_NS', 'NF_TABLES_INET', 'NFT_CT', 'NFT_QUEUE', 'NETFILTER_NETLINK_QUEUE']
     assert all(re.search(r'^CONFIG_' + flag + r'=[ym]$', text, re.M) for flag in flags)
     root = core / 'build_dir/target-x86_64_musl/root-x86'
+    # NJU apk feeds and the four-point quickstart patch must reach the rootfs.
+    feeds = (root / 'etc/apk/repositories.d/distfeeds.list').read_text(encoding='utf-8')
+    feed_lines = [line.strip() for line in feeds.splitlines() if line.strip()]
+    assert len(feed_lines) == 5, feed_lines
+    assert all(line.startswith('https://mirror.nju.edu.cn/immortalwrt/releases/25.12.2/')
+               and line.endswith('/packages.adb') for line in feed_lines), feed_lines
+    quickstart = root / 'usr/sbin/quickstart'
+    assert quickstart.is_file() and quickstart.stat().st_mode & 0o111, 'patched quickstart must be executable'
+    qs_data = quickstart.read_bytes()
+    assert b'https://mirror.nju.edu.cn/immortalwrt/' in qs_data and '南京大学'.encode() in qs_data
+    assert b'%v://%v/immortalwrt/' in qs_data and qs_data[0x3BD5D5:0x3BD5D7] == b'\x90\x90'
+    assert hashlib.md5(qs_data).hexdigest() == '3476eec5c59add847ef0de4627bfd6c4', 'unexpected quickstart patch build'
+    guard = (root / 'etc/uci-defaults/96-quickstart-nju').read_text(encoding='utf-8')
+    assert 'qs-guard' in guard and 'd510ae81ed99e30f1ab0ff1fcb204689' in guard
     for app in ['partexp', 'poweroffdevice']:
         menu = root / f'usr/share/luci/menu.d/luci-app-{app}.json'
         assert f'admin/system/{app}' in json.loads(menu.read_text(encoding='utf-8')), app
