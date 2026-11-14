@@ -62,13 +62,15 @@ ImmortalWrt **25.12.2 / Linux 6.12.103**，x86/64。r6 用 **TurboACC 1.4** 替�
 | 默认访问 | 192.168.1.1，root，初始密码为空，首次登录后设置 |
 | 网口规划 | eth0 作为 WAN，其余网口全部桥接进 br-lan 作为 LAN；WAN 协议保留出厂或用户既有配置（PPPoE 账号不被覆盖），单网口机型保持全 LAN |
 | 默认软件源 | 南京大学 ImmortalWrt 镜像（25.12.2 / apk），配置在 `/etc/apk/repositories.d/distfeeds.list` |
-| QuickStart | 出厂内置补丁版 0.13.0：清华槽位改「南京大学」、检测模板改 immortalwrt、跳过 apk 仓库不存在的 `.asc` 校验；首启备份 + rc.local 守卫防包升级回退 |
+| QuickStart | 出厂内置补丁版 0.13.0：清华槽位改「南京大学」、检测模板改 immortalwrt、跳过 apk 仓库不存在的 `.asc` 校验；首启备份 + rc.local 守卫防包升级回退；启动序号 42（早于 uhttpd 50）且启动时清 LuCI 菜单缓存，避免首页跳「状态-概览」 |
 | 防火墙 | 原生 firewall4/nftables；保留 iptables-nft 兼容层，禁用 legacy |
 | 网络加速 | 网络 → Turbo ACC 网络加速；默认开启 BBR + FQ、IPv4 全锥形 NAT |
 | 流量卸载 | 软件、硬件、SFE 默认关闭，IPv6 全锥形默认关闭；不编译 SFE |
 | 应用 | 41 个 LuCI 应用；702 个包相关配置符号含构建选项，成品包核对完整基线且新增 Honk 依赖 |
 
 固件默认使用南京大学 ImmortalWrt 镜像。QuickStart 首启向导的网络检测原本会去拉 `<源>/packages.adb.asc` 签名文件，而 25.12.2 的 apk 仓库（官方、南大、iStore 兼容源）都不提供该文件，结果任何源都会误报「软件源错误」；内置二进制把「校验失败→报错」的跳转跳过，网络与 DNS 检测保留。补丁工具见 [tools/patch_quickstart_nju.py](tools/patch_quickstart_nju.py)，首启脚本会把补丁版备份到 `/root/quickstart.patched-immortal` 并装好守卫，只在 `apk upgrade` 把 quickstart 还原成官方原版时自动恢复。⚠️ 补丁按 quickstart 0.13.0（基线 `0.13.0-r1`）的字节偏移制作；若 feed 升级了 quickstart，须先从新版本的 apk 包解出原始二进制（本版原包 md5 `d510ae81ed99e30f1ab0ff1fcb204689`）重跑补丁脚本，不要直接沿用这个二进制。
+
+QuickStart 首页偶发跳「状态 → 概览」是两层竞态叠加：`controller/quickstart.lua` 用 `pgrep quickstart` 决定注册真首页还是 `redirect_fallback`，而新版 LuCI 会把菜单树按文件 hash 缓存到 `/tmp/luci-indexcache.*.json`。开机瞬间若 quickstart（原 `START=92`，晚于 uhttpd 的 50）还没起来就被访问，坏菜单被固化；进程起来后缓存 hash 不变仍命中，直到下次重启才可能恢复。固件内置的 `/etc/init.d/quickstart` 把 `START` 提前到 **42**，并在 `start_service()` 末尾清掉菜单缓存自愈；首启脚本会重建 rc.d 链接（应对保留 `/etc` 的 sysupgrade 遗留 S92），把 init 备份到 `/root/quickstart.init.patched-immortal`，rc.local 守卫在包升级把脚本覆盖回官方版时自动恢复。
 
 TurboACC 基于 chenmozhijin 的 firewall4 分支，固定上游提交，保留 GPL-3.0 许可证。没有运行替换 firewall4/nftables 的上游安装器。适配说明与完整差异见 [配置说明](docs/turboacc-profile.md) 和 [适配补丁](docs/turboacc-immortalwrt-adaptation.diff)。准备脚本会将该差异应用到锁定上游并逐文件核对打包源码。BBR 作用于本机建立的 TCP 连接，普通 LAN 转发不保证提速。流量卸载保持关闭以保留 Bandix、dae 的统计与转发路径。
 

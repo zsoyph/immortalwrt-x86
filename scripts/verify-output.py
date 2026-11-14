@@ -89,6 +89,16 @@ def main():
     assert hashlib.md5(qs_data).hexdigest() == '3476eec5c59add847ef0de4627bfd6c4', 'unexpected quickstart patch build'
     guard = (root / 'etc/uci-defaults/96-quickstart-nju').read_text(encoding='utf-8')
     assert 'qs-guard' in guard and 'd510ae81ed99e30f1ab0ff1fcb204689' in guard
+    assert 'quickstart.init.patched-immortal' in guard and '^START=42' in guard
+    # quickstart's LuCI menu is registered by probing the process and then
+    # cached in /tmp. The shipped init must start before uhttpd and purge a
+    # stale fallback menu (Home -> admin/status) on every service start.
+    qs_init = root / 'etc/init.d/quickstart'
+    assert qs_init.is_file() and qs_init.stat().st_mode & 0o111, 'quickstart init must be executable'
+    qs_init_text = qs_init.read_text(encoding='utf-8')
+    assert 'START=42' in qs_init_text, 'quickstart must start before uhttpd'
+    assert 'rm -f /tmp/luci-indexcache.*.json' in qs_init_text, 'menu-cache self-heal missing'
+    assert 'procd_set_param respawn' in qs_init_text
     for app in ['partexp', 'poweroffdevice']:
         menu = root / f'usr/share/luci/menu.d/luci-app-{app}.json'
         assert f'admin/system/{app}' in json.loads(menu.read_text(encoding='utf-8')), app

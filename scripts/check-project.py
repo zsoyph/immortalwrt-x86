@@ -60,3 +60,10 @@ assert hashlib.sha256((root/'patches/oaf.patch').read_bytes()).hexdigest() == oa
 # The rustc CI LLVM artifact for 1.96.0 is pruned upstream (HTTP 404), so the
 # host rust recipe must build the LLVM sources shipped inside rustc-src instead.
 assert '--set=llvm.download-ci-llvm=false' in (root/'patches/packages.patch').read_text(encoding='utf-8')
+
+# quickstart registers its LuCI menu by probing the process and the resulting
+# tree is cached in /tmp/luci-indexcache.*.json. Starting after uhttpd lets a
+# fallback menu (Home -> admin/status) become sticky until the next reboot.
+qs_init = (root/'files/etc/init.d/quickstart').read_text(encoding='utf-8')
+assert 'START=42' in qs_init and 'rm -f /tmp/luci-indexcache.*.json' in qs_init
+assert 'quickstart.init.patched-immortal' in (root/'files/etc/uci-defaults/96-quickstart-nju').read_text(encoding='utf-8')

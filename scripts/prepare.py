@@ -110,10 +110,13 @@ def main():
     for file in (custom / 'luci-app-turboacc/root/etc').glob('*/*'):
         if file.is_file() and file.parent.name in ['init.d', 'uci-defaults']:
             file.chmod(0o755)
-    for file in (core / 'files/etc/uci-defaults').iterdir():
-        file.chmod(0o755)
+    for directory in ['etc/uci-defaults', 'etc/init.d']:
+        target = core / 'files' / directory
+        if target.is_dir():
+            for file in target.iterdir():
+                file.chmod(0o755)
     # Windows checkouts do not preserve the executable bit, so make sure the
-    # patched quickstart binary is executable on the Linux build runner.
+    # patched quickstart binary and the first-boot/init scripts are executable.
     sbin = core / 'files/usr/sbin'
     if sbin.is_dir():
         for file in sbin.iterdir():

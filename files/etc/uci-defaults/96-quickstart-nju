@@ -1,14 +1,21 @@
 #!/bin/sh
-# Keep the NJU / ImmortalWrt quickstart patch across package upgrades.
+# Keep the NJU / ImmortalWrt quickstart patch and the fixed boot script across
+# package upgrades.
 #
 # The image already ships the patched binary (md5 3476eec5...). On first boot
 # keep a copy in /root and install an idempotent rc.local guard: when an
 # `apk upgrade` of quickstart restores the stock 0.13.0 binary
 # (md5 d510ae81...), put the patched copy back automatically. A genuinely NEW
 # upstream version has a different md5 and is deliberately left alone.
+#
+# The init script is backed up too: it starts quickstart at 42 (before uhttpd
+# at 50) and purges a stale LuCI menu cache, which otherwise pins the "Home"
+# entry to redirect_fallback (jump to admin/status) after a boot race.
 
 bin=/usr/sbin/quickstart
 backup=/root/quickstart.patched-immortal
+init=/etc/init.d/quickstart
+init_backup=/root/quickstart.init.patched-immortal
 rc=/etc/rc.local
 
 [ -f "$bin" ] || exit 0
@@ -17,13 +24,23 @@ chmod 755 "$bin" || exit 1
 cp "$bin" "$backup" 2>/dev/null || exit 1
 chmod 644 "$backup"
 
+if [ -f "$init" ]; then
+    chmod 755 "$init" || exit 1
+    cp "$init" "$init_backup" 2>/dev/null || exit 1
+    chmod 644 "$init_backup"
+    # A sysupgrade that keeps /etc can retain the old S92 link even though the
+    # shipped script now declares START=42; rebuild both links from scratch.
+    "$init" disable
+    "$init" enable
+fi
+
 [ -f "$rc" ] || printf '#!/bin/sh\n\nexit 0\n' > "$rc"
 if ! grep -q 'qs-guard' "$rc"; then
     # Drop the stock trailing "exit 0" and append the guard instead.
     sed -i '/^exit[[:space:]][[:space:]]*0[[:space:]]*$/d' "$rc"
     cat >> "$rc" <<'EOF'
 
-# quickstart 补丁守卫：包升级把二进制还原成官方原版时，自动恢复南大 immortal 补丁版
+# quickstart 补丁守卫：包升级把二进制/启动脚本还原成官方原版时自动恢复
 if command -v md5sum >/dev/null 2>&1 && [ -f /root/quickstart.patched-immortal ]; then
     cur=$(md5sum /usr/sbin/quickstart 2>/dev/null | awk '{print $1}')
     if [ "$cur" = "d510ae81ed99e30f1ab0ff1fcb204689" ]; then
@@ -32,6 +49,15 @@ if command -v md5sum >/dev/null 2>&1 && [ -f /root/quickstart.patched-immortal ]
         chmod 755 /usr/sbin/quickstart
         /etc/init.d/quickstart restart
     fi
+fi
+# 官方 init（START=92、无菜单缓存自愈）被还原时，恢复 42 + 缓存清理
+if [ -f /root/quickstart.init.patched-immortal ] && ! grep -q '^START=42' /etc/init.d/quickstart 2>/dev/null; then
+    logger -t qs-guard "stock quickstart init detected, restoring START=42 self-heal"
+    cp /root/quickstart.init.patched-immortal /etc/init.d/quickstart
+    chmod 755 /etc/init.d/quickstart
+    /etc/init.d/quickstart disable
+    /etc/init.d/quickstart enable
+    /etc/init.d/quickstart restart
 fi
 
 exit 0
