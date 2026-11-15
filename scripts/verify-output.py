@@ -90,6 +90,17 @@ def main():
     guard = (root / 'etc/uci-defaults/96-quickstart-nju').read_text(encoding='utf-8')
     assert 'qs-guard' in guard and 'd510ae81ed99e30f1ab0ff1fcb204689' in guard
     assert 'quickstart.init.patched-immortal' in guard and '^START=42' in guard
+    assert 'oaf-menu-guard' in guard, 'single-menu self-heal missing'
+    # One OAF menu entry only: no hidden alias, quickstart home card points at
+    # /admin/services/oaf directly, and the asset version busts stale JS.
+    oaf_ctrl = (root / 'usr/lib/lua/luci/controller/oaf.lua').read_text(encoding='utf-8')
+    assert 'entry({"admin", "services", "oaf"' in oaf_ctrl
+    assert '"admin", "services", "appfilter"' not in oaf_ctrl, 'duplicate OAF alias in rootfs'
+    qs_index = (root / 'www/luci-static/quickstart/index.js').read_bytes()
+    assert qs_index.count(b'admin/services/appfilter') == 0
+    assert qs_index.count(b'admin/services/oaf') == 2
+    qs_view = (root / 'usr/lib/lua/luci/view/quickstart/main.htm').read_text(encoding='utf-8')
+    assert qs_view.count('?v=0.12.10-r1qs2') == 3
     # quickstart's LuCI menu is registered by probing the process and then
     # cached in /tmp. The shipped init must start before uhttpd and purge a
     # stale fallback menu (Home -> admin/status) on every service start.

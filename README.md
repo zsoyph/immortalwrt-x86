@@ -6,7 +6,7 @@
 
 ## OAF 使用
 
-菜单【服务 → 应用过滤】。默认不启用appfilter启动项；需要使用时在【系统 → 启动项】启用并启动appfilter，再配置过滤规则。包中已建立配置文件。特征识别受加密、特征库和代理/eBPF绕行影响，不承诺识别全部Honk/DAE代理流量。
+菜单【服务 → 应用过滤】只有一个入口；quickstart 首页「家长控制」直接指向 `/admin/services/oaf`，静态资源版本串已 bump 以避免浏览器缓存旧 JS。包升级还原官方文件后由首启守卫自动恢复，详见 [单菜单修复](docs/oaf-menu-fix.md)。默认不启用appfilter启动项；需要使用时在【系统 → 启动项】启用并启动appfilter，再配置过滤规则。包中已建立配置文件。特征识别受加密、特征库和代理/eBPF绕行影响，不承诺识别全部Honk/DAE代理流量。
 
 后端7.0.2-r2，LuCI7.0-r2，kmod-oaf6.12.103-r1；本地修订用于配置安装及加速设置适配。OAF“关闭加速”只处理流量卸载，不自动关闭TurboACC的全锥形或BBR。源码和适配见 [oaf.lock.json](oaf.lock.json)、[r9说明](docs/r9-oaf.md)、[适配补丁](patches/oaf.patch)。GPL许可证和原作者引用保留。
 

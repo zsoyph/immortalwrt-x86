@@ -56,6 +56,17 @@ assert {'honk','luci-app-honk','luci-lib-daeuniverse','kmod-nft-queue','kmod-nfn
 oaf = json.loads((root / 'oaf.lock.json').read_text())
 assert {'appfilter','kmod-oaf','luci-app-oaf','luci-i18n-oaf-zh-cn'} <= selected
 assert hashlib.sha256((root/'patches/oaf.patch').read_bytes()).hexdigest() == oaf['patch_sha256']
+# The 25.12 ucode dispatcher ignores page.hidden, so the quickstart alias
+# entry must be gone. The home card now links straight to /admin/services/oaf
+# and its asset URLs are version-bumped so browsers drop the cached JS.
+assert 'entry({"admin", "services", "appfilter"' not in (root/'patches/oaf.patch').read_text(encoding='utf-8')
+qs_js = (root/'files/www/luci-static/quickstart/index.js').read_bytes()
+assert qs_js.count(b'admin/services/appfilter') == 0
+assert qs_js.count(b'admin/services/oaf') == 2
+qs_view = (root/'files/usr/lib/lua/luci/view/quickstart/main.htm').read_text(encoding='utf-8')
+assert qs_view.count('?v=0.12.10-r1qs2') == 3
+guard = (root/'files/etc/uci-defaults/96-quickstart-nju').read_text(encoding='utf-8')
+assert 'oaf-menu-guard' in guard and '/root/oaf-single-menu' in guard
 
 # The rustc CI LLVM artifact for 1.96.0 is pruned upstream (HTTP 404), so the
 # host rust recipe must build the LLVM sources shipped inside rustc-src instead.

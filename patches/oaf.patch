@@ -37,9 +37,9 @@
  function index()
 -    entry({"admin", "services", "oaf"}, firstchild(), _("Parental Control"), 20).dependent = true
 +    entry({"admin", "services", "oaf"}, firstchild(), "应用过滤", 20).dependent = true
-+    -- The iStore quickstart home page links to /admin/services/appfilter.
-+    local page = entry({"admin", "services", "appfilter"}, alias("admin", "services", "oaf"), "应用过滤")
-+    page.hidden = true
++    -- Single menu entry: the quickstart home card now links here directly.
++    -- The legacy quickstart alias entry is gone because ImmortalWrt 25.12's
++    -- ucode dispatcher ignores page.hidden and renders it as a second menu.
  end
 --- a/open-app-filter/Makefile
 +++ b/open-app-filter/Makefile

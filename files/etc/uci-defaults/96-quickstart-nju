@@ -17,6 +17,10 @@ backup=/root/quickstart.patched-immortal
 init=/etc/init.d/quickstart
 init_backup=/root/quickstart.init.patched-immortal
 rc=/etc/rc.local
+fixdir=/root/oaf-single-menu
+oaf_ctrl=/usr/lib/lua/luci/controller/oaf.lua
+qs_index=/www/luci-static/quickstart/index.js
+qs_view=/usr/lib/lua/luci/view/quickstart/main.htm
 
 [ -f "$bin" ] || exit 0
 # Belt and braces: restore the executable bit even if the image builder lost it.
@@ -32,6 +36,17 @@ if [ -f "$init" ]; then
     # shipped script now declares START=42; rebuild both links from scratch.
     "$init" disable
     "$init" enable
+fi
+
+# Three package-owned files carry the single-menu fix (oaf controller plus the
+# quickstart home JS/template). Back them up so an apk upgrade that restores the
+# stock files can be repaired by the rc.local guard below.
+if [ -f "$oaf_ctrl" ] && [ -f "$qs_index" ] && [ -f "$qs_view" ]; then
+    mkdir -p "$fixdir" || exit 1
+    cp "$oaf_ctrl" "$fixdir/oaf.lua" 2>/dev/null || exit 1
+    cp "$qs_index" "$fixdir/index.js" 2>/dev/null || exit 1
+    cp "$qs_view" "$fixdir/main.htm" 2>/dev/null || exit 1
+    chmod 644 "$fixdir"/* 2>/dev/null
 fi
 
 [ -f "$rc" ] || printf '#!/bin/sh\n\nexit 0\n' > "$rc"
@@ -58,6 +73,29 @@ if [ -f /root/quickstart.init.patched-immortal ] && ! grep -q '^START=42' /etc/i
     /etc/init.d/quickstart disable
     /etc/init.d/quickstart enable
     /etc/init.d/quickstart restart
+fi
+# 单菜单守卫：升级 luci-app-oaf / luci-app-quickstart 还原官方文件时自动恢复
+if [ -d /root/oaf-single-menu ]; then
+    changed=0
+    ctrl=/usr/lib/lua/luci/controller/oaf.lua
+    index=/www/luci-static/quickstart/index.js
+    view=/usr/lib/lua/luci/view/quickstart/main.htm
+    if ! grep -Fq '"应用过滤"' "$ctrl" 2>/dev/null || grep -Fq '"admin", "services", "appfilter"' "$ctrl" 2>/dev/null; then
+        cp /root/oaf-single-menu/oaf.lua "$ctrl"
+        changed=1
+    fi
+    if grep -Fq 'admin/services/appfilter' "$index" 2>/dev/null || ! grep -Fq 'admin/services/oaf' "$index" 2>/dev/null; then
+        cp /root/oaf-single-menu/index.js "$index"
+        changed=1
+    fi
+    if ! grep -Fq '0.12.10-r1qs2' "$view" 2>/dev/null; then
+        cp /root/oaf-single-menu/main.htm "$view"
+        changed=1
+    fi
+    if [ "$changed" = 1 ]; then
+        logger -t oaf-menu-guard "restored single OAF menu after package upgrade"
+        rm -f /tmp/luci-indexcache.*.json
+    fi
 fi
 
 exit 0

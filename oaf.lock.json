@@ -7,6 +7,7 @@
   "kernel": "6.12.103",
   "menu": "服务/应用过滤",
   "default_service": "enabled at boot together with the bundled services; configured via the VPN/LuCI pages, no manual System/Startup step needed",
-  "patch_sha256": "008bafc833b2c06bac08799196048a1cb691822b4415fab93ab175bacc18c9e1",
-  "runtime_tested": false
+  "patch_sha256": "9cd3dbdfdfcbd46a9db0e958f15cdc87e97b811bd92f529f5a0c138a834e71f7",
+  "runtime_tested": false,
+  "menu_alias": "removed; quickstart home card links to /admin/services/oaf directly"
 }
